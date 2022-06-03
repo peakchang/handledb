@@ -739,6 +739,12 @@ def newdbup(request):
                     for i in range(set_arr_count):
                         dbval.append('')
 
+
+                # 창현이거 테스트
+                chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]], db_phone=dbval[0])
+                if len(chk_db_list) > 0:
+                    continue
+
                 db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
                                  db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
                 db_up.save()
@@ -750,6 +756,7 @@ def newdbup(request):
 
             # 쌩 업로드 완료! DB 중복 체크 시작!
             lastSeenId = float('-Inf')
+            print(lastSeenId)
             chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('-db_phone')
             print(chk_db_list)
             for row in chk_db_list:
