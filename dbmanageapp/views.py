@@ -763,7 +763,7 @@ def newdbup(request):
                 if row.db_phone == lastSeenId:
                     print(row.db_phone)
                     print(lastSeenId)
-                    # row.delete()
+                    row.delete()
                     print('ljj')
                 else:
                     lastSeenId = row.db_phone
