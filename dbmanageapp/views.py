@@ -741,9 +741,9 @@ def newdbup(request):
 
 
                 # 창현이거 테스트
-                chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]], db_phone=dbval[0])
-                if len(chk_db_list) > 0:
-                    continue
+                # chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]], db_phone=dbval[0])
+                # if len(chk_db_list) > 0:
+                #     continue
 
                 db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
                                  db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
@@ -757,11 +757,14 @@ def newdbup(request):
             # 쌩 업로드 완료! DB 중복 체크 시작!
             lastSeenId = float('-Inf')
             print(lastSeenId)
-            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('-db_phone')
+            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('db_phone')
             print(chk_db_list)
             for row in chk_db_list:
                 if row.db_phone == lastSeenId:
-                    row.delete()
+                    print(row.db_phone)
+                    print(lastSeenId)
+                    # row.delete()
+                    print('ljj')
                 else:
                     lastSeenId = row.db_phone
 
@@ -808,9 +811,6 @@ def newdbup(request):
             return render(request, 'dbmanageapp/newdbup.html',
                           {'marketing_list': marketing_list, 'sample_list': sample_list,
                            'error_message': error_message})
-
-    lastSeenId = float('-Inf')
-    print(lastSeenId)
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 
