@@ -750,11 +750,12 @@ def newdbup(request):
 
             # 쌩 업로드 완료! DB 중복 체크 시작!
             lastSeenId = float('-Inf')
-            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('db_phone')
+            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('-db_phone')
+            print(chk_db_list)
             for row in chk_db_list:
                 if row.db_phone == lastSeenId:
-                    row.delete()  # We've seen this id in a previous row
-                else:  # New id found, save it and check future rows for duplicates.
+                    row.delete()
+                else:
                     lastSeenId = row.db_phone
 
 
