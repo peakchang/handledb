@@ -1,0 +1,309 @@
+[33mcommit 5b8c953f7fd61712a25b8567a5f8cd527c44cee2[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: park changyong <changyong112@naver.com>
+Date:   Thu May 19 12:03:57 2022 +0900
+
+    0519 중복 체크 완료
+
+[33mcommit ce3972f0b44bd8abe161054580575e801346fed0[m
+Author: park changyong <changyong112@naver.com>
+Date:   Thu May 19 03:43:23 2022 +0900
+
+    0519 일단 완성 추가 테스트 필요
+
+[33mcommit 505cd58c0985beaf4efe7d1e04085b095a3d9d89[m
+Author: park changyong <changyong112@naver.com>
+Date:   Thu May 19 02:40:23 2022 +0900
+
+    0519 스택 참고
+
+[33mcommit 5b37954777895a3a91e4fff55cd166873a24b75b[m
+Author: park changyong <changyong112@naver.com>
+Date:   Thu May 19 02:23:38 2022 +0900
+
+    0519 다시 원점으로
+
+[33mcommit 8b4f8396ca435c14d950ecc3a1a7ae704acb51de[m
+Author: park changyong <changyong112@naver.com>
+Date:   Thu May 19 02:19:31 2022 +0900
+
+    0519 중복처기 try로
+
+[33mcommit 4aacd7dadc3202435becb019c7070c3fff0ab554[m
+Author: park changyong <changyong112@naver.com>
+Date:   Thu May 19 01:44:15 2022 +0900
+
+    0519 쌩업로드 후 중복제거
+
+[33mcommit 30595c89e3889d78d1b1de5abf6c9764efdc758c[m
+Author: park changyong <changyong112@naver.com>
+Date:   Thu May 19 01:41:25 2022 +0900
+
+    0519 제발 되라
+
+[33mcommit 1310bf81d3c19f8262e546314f63948ba57ac0cd[m
+Author: park changyong <changyong112@naver.com>
+Date:   Thu May 19 01:13:41 2022 +0900
+
+    0519 먼저 그냥 다 올려보자
+
+[33mcommit 7a2c7585380252ff03a0bb9008c78cd1cad7fbdb[m
+Author: park changyong <changyong112@naver.com>
+Date:   Mon May 16 09:03:42 2022 +0900
+
+    0516 memo write num
+
+[33mcommit b8d5872f1894303e8810f03fa75f6c24f1584e13[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Sat May 14 14:06:04 2022 +0900
+
+    0514 strange exc2
+
+[33mcommit 4d73d14f93948d661a0dd6c157837e39ee9693de[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Sat May 14 13:57:37 2022 +0900
+
+    0514 strange excel
+
+[33mcommit 3e75ab85a7b31537583e09d1aa048958a2ec12cb[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 12 17:30:14 2022 +0900
+
+    0512 failed
+
+[33mcommit 902eb2950cdb1a1ad4aa87c44c90a5669affe9a4[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 12 13:40:43 2022 +0900
+
+    0512 memo_delete
+
+[33mcommit a119e6605f580211b9694f4741897cc82421b29b[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 12 13:05:09 2022 +0900
+
+    0512 3memo_2
+
+[33mcommit 53a4be950b79a94767ef19c4345c04f408b5aa19[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 12 12:55:53 2022 +0900
+
+    0512 3memo
+
+[33mcommit acfa207ec6b97724f99b4f6b4979d5a4bdec0f0c[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 12 12:48:39 2022 +0900
+
+    0512 chong
+
+[33mcommit 8f578537f865b1121eb461a7d59ab584836d2bdd[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 12 11:41:19 2022 +0900
+
+    chong
+
+[33mcommit b1fdf2e265ae8bfe66867c81c7055f27161d1d5e[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 12 11:27:30 2022 +0900
+
+    0512 update
+
+[33mcommit 04552f1b80459bbba767e17eb347ffba426b73ea[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 10 12:53:04 2022 +0900
+
+    0510 update
+
+[33mcommit 9371ac4e6bb07b4fc547c72c1e60259dc2ace335[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Mon May 9 17:06:53 2022 +0900
+
+    0509 update
+
+[33mcommit c614e8a2842eb05e8b3aadbcb39f542477969073[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Fri May 6 15:56:21 2022 +0900
+
+    0506 second cocmccijdd
+
+[33mcommit 02891a1ad3111b4999bb8eb61099953fecf899aa[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Fri May 6 14:21:16 2022 +0900
+
+    0506 modify
+
+[33mcommit c4f780b0371c94857a1d6f4bdd481403b6307d7a[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 5 20:13:32 2022 +0900
+
+    sisi ready okok
+
+[33mcommit 9aeab743b0f9c014a885126927e4a924c516c762[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 5 19:51:37 2022 +0900
+
+    ready on
+
+[33mcommit 24b2ed042c8377285274d1aef0cf88c6cad350a9[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 5 03:19:19 2022 +0900
+
+    a;ksdjfalsdf
+
+[33mcommit bea0b5f00c138e427b30d11bc64af180d40bdd8f[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 5 03:16:13 2022 +0900
+
+    sdlfjsdf
+
+[33mcommit df08aee7e2384c3e0551bb85cb05c1be9b727ca3[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 5 03:09:57 2022 +0900
+
+    sdfkalsdf
+
+[33mcommit ed4f8e0818d9d118d9f264d1a7f0ba93c8794115[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Thu May 5 01:19:14 2022 +0900
+
+    remove env
+
+[33mcommit 7c93ad1190cf6b69c9d6476125e97c9dba0e384c[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Wed May 4 23:45:57 2022 +0900
+
+    goto sisisi
+
+[33mcommit 51a839e6212d2401c418e4b585aa84f2bab4b0b9[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Wed May 4 23:25:31 2022 +0900
+
+    ready to on
+
+[33mcommit cc8af91b4d84b72226a1f32654be02a01d08c331[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Wed May 4 23:21:43 2022 +0900
+
+    on_ready whiy
+
+[33mcommit a4b73e7d0677548ab5cb58abab5367f2df7f44d6[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Wed May 4 18:04:58 2022 +0900
+
+    0504 3yochung ok
+
+[33mcommit 2c822e7c87b4b3d144b3f6c8e2bba99defa0c704[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 17:04:00 2022 +0900
+
+    auto checked
+
+[33mcommit a2f0036f29867287bff5d3fe1d1d39da3ed06e46[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 16:35:34 2022 +0900
+
+    asldjfadsffd
+
+[33mcommit c57fc03f10c49d5bc183875ccc8dca0baecdc643[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 16:20:40 2022 +0900
+
+    fifi modify
+
+[33mcommit 0965ee2885a876406e7dbed0306004464eb6b669[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 14:45:08 2022 +0900
+
+    asoidjfoaksodfk
+
+[33mcommit 56470f0794edb9e63ba656eb423d7b0765c64583[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 14:41:29 2022 +0900
+
+    asldjflasjdf
+
+[33mcommit 34f6c263801f929340bbf5eaa1aac177e9f9b147[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 14:35:54 2022 +0900
+
+    alsjdflajsdf
+
+[33mcommit e1e580afae4a7fbdafafeb37cd7b9a64791e8606[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 14:34:04 2022 +0900
+
+    asljfalsdfj
+
+[33mcommit af018fb1af4f2fc30f8baca303df435ef751ad97[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 14:07:14 2022 +0900
+
+    ready to on
+
+[33mcommit bf33e2add82af467e524901586dc9961681dd4eb[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 11:55:32 2022 +0900
+
+    0503 noerr_reset_12:00_1
+
+[33mcommit 2d3722ea9e83cdf482f911d83ed6f336c2947b24[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 11:30:38 2022 +0900
+
+    noerr_7
+
+[33mcommit bdc1d174e924234c8c613859789a67ca66b3c898[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 11:05:12 2022 +0900
+
+    noerr reset1
+
+[33mcommit 6f1057a4feb5db5cc9c405777021c9f0b1aaa9a5[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 11:01:36 2022 +0900
+
+    no err _6
+
+[33mcommit a7a7eeec353469a39e73fa324788fda2e40dfd0e[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 10:59:05 2022 +0900
+
+    noerr_4
+
+[33mcommit fcd6f237258f64aef41dccd642d1d980365df86a[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 10:54:22 2022 +0900
+
+    no error_3
+
+[33mcommit 5f048e45cc7a8641315649e384d5f6760b9f0d5b[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 10:49:25 2022 +0900
+
+    no erroorrr_2
+
+[33mcommit 1eceda711bb6d2e4c9117b845d85428726c881dd[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 10:45:22 2022 +0900
+
+    0503 no error_1
+
+[33mcommit 719a59a81767457930a8b44ba7ff4f3a801747d5[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 06:22:49 2022 +0900
+
+    0622 noerror_1
+
+[33mcommit 0a9c13aca3ea15fb7f70335ecd4e46f83b9ea578[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 06:17:41 2022 +0900
+
+    asldjfalsjdf
+
+[33mcommit acd261f827d49826011178670fa944b9ccdb4fd3[m
+Author: ridebus82 <ridebus82@nate.com>
+Date:   Tue May 3 06:13:20 2022 +0900
+
+    Revert "pre last"
+    
+    This reverts commit 37ea5cfd7ccd82da51a294fe0104a246e5f14540.
+
+[33mcommit cd7f18039b00d745421b4102e9eaf0c6bb

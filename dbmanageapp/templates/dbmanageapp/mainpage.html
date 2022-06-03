@@ -1,0 +1,86 @@
+{% extends 'db_base.html' %}
+
+{% block dbmanage_content %}
+{% load humanize %}
+<style>
+.mainh{font-family: 'Pretendard-Bold';}
+.cb_top{font-size:25px; padding-bottom:5px; font-family: 'Pretendard-Bold';}
+.cb_bottom{text-align:right; font-size:20px; padding-top:5px; font-family: 'Pretendard-Medium';}
+</style>
+
+
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container-fluid px-4">
+            <h1 class="mt-4 mainh">{{ request.user.nickname }}님 요약 통계</h1>
+<!--            <ol class="breadcrumb mb-4">-->
+<!--                <li class="breadcrumb-item active">Dashboard</li>-->
+<!--            </ol>-->
+            <div class="row mt-4">
+                <div class="col-xl-4 col-md-6">
+                    <div class="card bg-primary text-white mb-4">
+                        <div class="card-body cb_top">이번달 매출</div>
+                        <div class="card-body cb_bottom">
+                            {% if n_sales == 'None' %}
+                            이번달 매출이 없습니다.
+                            {% else %}
+                            {{ n_sales|intcomma }} 원
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6">
+                    <div class="card bg-danger text-white mb-4">
+                        <div class="card-body cb_top">전월 매출</div>
+                        <div class="card-body cb_bottom">
+                            {% if l_sales == None %}
+                            전달 매출이 없습니다.
+                            {% else %}
+                            {{ l_sales|intcomma }} 원
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6">
+                    <div class="card bg-success text-white mb-4">
+                        <div class="card-body cb_top">성장률</div>
+                        <div class="card-body cb_bottom">
+                            {% if growth_per == None %}
+                            집계 전입니다.
+                            {% else %}
+                            {{ growth_per }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+<!--            <div class="row">-->
+<!--                <div class="col-xl-6">-->
+<!--                    <div class="card mb-4">-->
+<!--                        <div class="card-header">-->
+<!--                            <i class="fas fa-chart-area me-1"></i>-->
+<!--                            Area Chart Example-->
+<!--                        </div>-->
+<!--                        <div class="card-body">-->
+<!--                            <canvas id="myAreaChart" width="100%" height="40"></canvas>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="col-xl-6">-->
+<!--                    <div class="card mb-4">-->
+<!--                        <div class="card-header">-->
+<!--                            <i class="fas fa-chart-bar me-1"></i>-->
+<!--                            Bar Chart Example-->
+<!--                        </div>-->
+<!--                        <div class="card-body">-->
+<!--                            <canvas id="myBarChart" width="100%" height="40"></canvas>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+        </div>
+    </main>
+{% endblock %}

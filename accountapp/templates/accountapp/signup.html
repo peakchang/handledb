@@ -1,0 +1,87 @@
+{% extends 'account_base.html' %}
+
+{% block accountcontent %}
+
+<style>
+    #layoutAuthentication_content{background-color:#0d6efd;}
+
+</style>
+
+<div id="layoutAuthentication">
+    <div id="layoutAuthentication_content">
+        <main>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-7">
+                        <div class="card shadow-lg border-0 rounded-lg mt-5">
+                            <div class="card-header"><h3 class="text-center font-weight-light my-4">회원가입!!!!</h3></div>
+                            <div class="card-body">
+
+                                <form method="post"">
+
+                                    {% csrf_token %}
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputUsername" type="text" placeholder="id"
+                                               name="username"/>
+                                        <label for="inputUsername">아이디를 입력하세요</label>
+                                    </div>
+                                    <div>{{ error_noid }}</div>
+
+
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputnickname" type="text" name="nickname"
+                                               placeholder="name@example.com"/>
+                                        <label for="inputEmail">닉네임을 입력하세요</label>
+                                    </div>
+
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3 mb-md-0">
+                                                <input class="form-control" id="inputPassword" type="password"
+                                                       name="password1" placeholder="Create a password"/>
+                                                <label for="inputPassword">비밀번호</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3 mb-md-0">
+                                                <input class="form-control" id="inputPasswordConfirm" type="password"
+                                                       name="password2" placeholder="Confirm password"/>
+                                                <label for="inputPasswordConfirm">비밀번호 확인</label>
+                                            </div>
+                                        </div>
+                                        <div>{{ error_nopass }}</div>
+                                    </div>
+                                    <div class="mt-4 mb-0">
+                                        <input type="submit" class="btn btn-primary btn-block w-100 chksubmit" value="계정 생성하기">
+                                    </div>
+                                </form>
+
+
+                            </div>
+                            <div class="card-footer text-center py-3">
+                                <div class="small">
+                                    <a href="{% url 'accountapp:login' %}">로그인 페이지 바로가기</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+  $('.chksubmit').click(function(){
+    var inputPassword = document.querySelector('#inputPassword')
+    if(inputPassword.value.length < 4){
+      alert('비밀번호가 너무 짧습니다! 4자리 이상으로 입력해주세요!')
+      return false;
+    }
+  })
+
+</script>
+
+{% endblock %}

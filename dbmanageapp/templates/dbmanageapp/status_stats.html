@@ -1,0 +1,202 @@
+{% extends 'db_base.html' %}
+
+{% block dbmanage_content %}
+
+<style>
+  .none_date{padding:15px; border:1px solid #ccc; border-top:none; text-align:center; font-size:14px;}
+  @media screen and (max-width: 992px) {
+    .table_wrap{width: 100%; overflow: auto;}
+    .table_area{width:100%; min-width: 1000px;}
+    .table_area_mk{width:100%; min-width: 880px;}
+
+    .divbtn{font-size: 13px;}
+    .employee_list{font-size: 12px;}
+  }
+</style>
+<div id="layoutSidenav_content">
+  <main>
+    <div class="container">
+      <!-- 검색 -->
+      <div class="pt-4">
+        <form action="" method="get">
+
+          <div class="inputlist">
+            <div class="inputflex">
+              <div class="center_text">
+                <input type="date" name="sd" value="{{ get_list.sd }}" class="currentDate_sd">
+              </div>
+              <div class="center_text">
+                <span>~</span>
+              </div>
+
+              <div class="center_text">
+                <input type="date" name="ed" value="{{ get_list.ed }}" class="currentDate_ed">
+              </div>
+            </div>
+            <!-- <div class="inputflex">
+            <div class="center_text">
+            <span>담당자 :</span>
+          </div>
+
+          <div class="select is-small">
+          <select name="mn">
+          <option value="">전체선택</option>
+          {% for mlist in manager_list %}
+          <option value="{{ mlist.username }}" {% if mlist.username == get_list.mn %}
+          selected="selected"
+          {% endif %}>{{ mlist.nickname }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+  </div> -->
+  <div class="inputflex">
+    <button class="button is-small is-link">검색</button>
+  </div>
+
+
+
+  <a href="{% url 'dbmanage:alldblist' %}" class="button is-small is-warning">초기화</a>
+</div>
+</div>
+</form>
+
+<!-- 검색끝 -->
+
+<!--      상태값 만들기 ajax-->
+
+{% if error %}
+<span class="tag is-danger is-normal">{{ error }}</span>
+{% endif %}
+
+<!-- DB 요약 시작 -->
+<div class="col-12 dbtable_area">
+  <table class="type05 w-100">
+    <tr>
+      <th>매니저</th>
+      {% for slist in status_list %}
+      <th>{{ slist }}</th>
+      {% endfor %}
+    </tr>
+    {% for alist in all_list_arr %}
+    <tr>
+      {% for manage_count in alist %}
+      {% if forloop.counter0 == 0 %}
+      <td>{{ manage_count.username }}</td>
+      {% else %}
+      <td>{{ manage_count }}</td>
+      {% endif %}
+
+      {% endfor %}
+    </tr>
+    {% endfor %}
+
+    <tr>
+      {% for per_list,dibsum in appon_list %}
+      <td style="background-color:#FAF4C0">
+        {{ dibsum }}
+
+        {% if per_list != 0 %}
+        ({{ per_list }})
+        {% endif %}
+
+      </td>
+      {% endfor %}
+    </tr>
+  </table>
+</div>
+<!-- DB 요약 끝 -->
+
+
+<!-- DB 리스트 시작 -->
+
+<script !src="">
+
+
+  var str = location.href;
+  var q_string = str.split('?')
+  document.querySelector('.qstring').value = q_string[1]
+
+
+
+  var phnum = document.querySelectorAll('.phnum')
+  for (var i = 0; i < phnum.length; i++) {
+    var tempval = phnum[i].innerText
+    var tempval = phoneformat(tempval)
+    $(phnum[i]).empty()
+    $(phnum[i]).append(tempval)
+  }
+
+
+  function phoneformat(num){
+    return num.replace(/(^02.{0}|^01.{1}|^[0-9]{3})([0-9]*)([0-9]{4})/, "$1-$2-$3");
+  }
+
+  $('.change_manager').change(function(){
+    var checked_opt = $('.change_manager option:checked').text()
+    document.querySelector('.change_manager_nick').value = checked_opt
+  })
+
+  $('.fist_comment').click(function(){
+    var onval = this.parentNode.children
+    $(onval).not('.fist_comment').toggle();
+  })
+
+  $('#allchk').change(function(){
+    if(this.checked == true){
+      $(".listchk").prop("checked", true);
+    }else {
+      $(".listchk").prop("checked", false);
+    }
+  })
+
+</script>
+
+
+<nav class="pagination mt-2" role="navigation" aria-label="pagination">
+  <ul class="pagination-list" style="justify-content:center;">
+    {% for paging in pageval %}
+    {% if paging == get_page_num %}
+    <li>
+      <a class="pagination-link is-current ch_a" aria-current="page">{{ paging }}</a>
+    </li>
+    {% else %}
+    <li>
+      <a class="pagination-link ch_a" href="?page={{ paging }}">{{ paging }}</a>
+    </li>
+    {% endif %}
+
+    {% endfor %}
+  </ul>
+</nav>
+</div>
+</main>
+
+
+<!--    페이징 처리 스크립트-->
+
+{% if not get_list.sd %}
+<script !src="">
+  var t_date = new Date()
+  // var t_date = new Date(t_date.getFullYear(), t_date.getMonth(), 1);
+  t_date.setHours(t_date.getHours()+9)
+  var dateval = t_date.toISOString().substring(0, 10)
+  $('.currentDate_sd').val(dateval)
+
+</script>
+{% endif %}
+
+{% if not get_list.ed %}
+<script !src="">
+  var t_date = new Date()
+  t_date.setHours(t_date.getHours()+9)
+  var dateval = t_date.toISOString().substring(0, 10)
+  $('.currentDate_ed').val(dateval)
+
+</script>
+{% endif %}
+
+
+
+
+{% endblock %}

@@ -1,0 +1,363 @@
+{% extends 'db_base.html' %}
+
+{% block dbmanage_content %}
+<style media="screen">
+.addmak_content{padding: 20px;}
+
+
+
+
+</style>
+
+<div class="modal addmaketing">
+    <div class="modal-background"></div>
+    <div class="modal-content addmak_content">
+
+        <form action="" method="post">
+            {% csrf_token %}
+            <table class="type07">
+                <tr>
+                    <th >업체명(구분명)</th>
+                    <td>
+                        <input class="input is-small" type="text" name="mk_company" required>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th >담당자</th>
+                    <td>
+                        <input class="input is-small" type="text" name="mk_name">
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>전화번호</th>
+                    <td>
+                        <input class="input is-small" type="text" name="mk_phone">
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>광고형태</th>
+                    <td>
+                        <div class="ad_control">
+
+                            <label class="radio">
+                                <input type="radio" name="mk_advtype" value="cpa" checked>
+                                CPA
+                            </label>
+
+                            <label class="radio">
+                                <input type="radio" name="mk_advtype" value="cpc">
+                                CPC
+                            </label>
+
+                            <label class="radio">
+                                <input type="radio" name="mk_advtype" value="cps">
+                                CPS
+                            </label>
+
+                            <label class="radio">
+                                <input type="radio" name="mk_advtype" value="cpv">
+                                CPV
+                            </label>
+
+                            <label class="radio">
+                                <input type="radio" name="mk_advtype" value="cpm">
+                                CPM
+                            </label>
+                        </div>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>URL</th>
+                    <td>
+                        <input class="input is-small" type="text" name="mk_url">
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>메모</th>
+                    <td>
+                        <input class="input is-small" type="text" name="mk_memo">
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>상태</th>
+                    <td>
+                        <div class="status_control">
+                            <label class="radio">
+                                <input type="radio" name="mk_status" value="Y" checked>
+                                거래
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="mk_status" value="N">
+                                미거래
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <input type="hidden" name="mk_id">
+
+            <div class="mt-4 text-center makelist">
+                <button class="button is-link is-small" name="gosubmit" value="create">생성</button>
+                <span class="button is-danger is-small do_close">닫기</span>
+            </div>
+
+            <div class="mt-4 text-center updatelist">
+                <button class="button is-link is-small" name="gosubmit" value="update">수정</button>
+                <button class="button is-danger is-small" name="gosubmit" value="delete">삭제</button>
+                <span class="button is-info is-small do_close">닫기</span>
+            </div>
+    </div>
+    </form>
+</div>
+
+
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container px-4 pt-4">
+
+            <div class="inputlist">
+
+
+                <div class="inputflex">
+                    <div class="center_text">
+                        <span>리스트수 :</span>
+                    </div>
+
+                    <div class="select is-small">
+                        <select>
+                            <option>20</option>
+                            <option>50</option>
+                            <option>100</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="inputflex">
+                    <div class="center_text">
+                        <span>상태 :</span>
+                    </div>
+
+                    <div class="select is-small">
+                        <select>
+                            <option>사용</option>
+                            <option>중지</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="inputflex">
+                    <div class="center_text">
+                        <span>등급 :</span>
+                    </div>
+
+                    <div class="select is-small">
+                        <select>
+                            <option>전체</option>
+                            <option>A등급</option>
+                            <option>B등급</option>
+                            <option>C등급</option>
+                            <option>D등급</option>
+                            <option>E등급</option>
+
+                        </select>
+                    </div>
+                </div>
+
+                <div class="inputflex">
+                    <div class="select is-small">
+                        <select>
+                            <option>아이디</option>
+                            <option>이름</option>
+                            <option>연락처</option>
+                        </select>
+                    </div>
+
+                    <div class="ml-1">
+                        <input class="input is-small" type="text">
+                    </div>
+                    <div class="">
+                        <button class="button is-small is-link">검색</button>
+                    </div>
+                </div>
+
+
+                <div class="">
+                    <button class="button is-danger is-small ml-5 add_mkt">마케팅 추가</button>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- ********** 검색 끝 -->
+
+        <div class="table_wrap container">
+
+            <div class="table_area">
+                <table class="type08">
+                    <tr>
+                        <th style="width:109px;">업체명(구분명)</th>
+                        <th style="width:80px;">담당자</th>
+                        <th>전화번호</th>
+                        <th>광고형태</th>
+                        <th>URL</th>
+                        <th>메모</th>
+                        <th>거래상태</th>
+                        <th>등록일</th>
+                        <th>관리</th>
+                    </tr>
+                    {% for val in marketing_list %}
+                    <tr>
+
+                        <td><span>{{ val.mk_company }}</span></td>
+                        <td><span>{{ val.mk_name }}</span></td>
+                        <td><span>{{ val.mk_phone }}</span></td>
+                        <td><span>{{ val.mk_advtype }}</span></td>
+                        <td>
+                            {% if val.mk_url %}
+                            <a href="{{ val.mk_url }}" target="_blank">
+                                <span>{{ val.mk_url }}</span>
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td><span>{{ val.mk_memo }}</span></td>
+                        <td><span>{{ val.mk_status }}</span></td>
+                        <td>{{ val.mk_date }}</td>
+                        <td>
+                            <span class="button is-info is-small update_mkt">수정</span>
+                            <input type="hidden" name="" value="{{ val.id }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+
+    <script type="text/javascript">
+  $('.add_mkt').click(function(){
+
+    $('.addmaketing').addClass('is-active')
+    $('.makelist').show()
+    $('.updatelist').hide()
+    onset_radio_val('mk_advtype')
+    onset_radio_val('mk_status')
+    document.querySelector('input[name=mk_company]').value = ""
+    document.querySelector('input[name=mk_name]').value = ""
+    document.querySelector('input[name=mk_phone]').value = ""
+    document.querySelector('input[name=mk_url]').value = ""
+    document.querySelector('input[name=mk_memo]').value = ""
+  })
+
+  $('.update_mkt').click(function(){
+    $('.addmaketing').addClass('is-active')
+
+    var move_id = this.nextElementSibling.value
+    document.querySelector('input[name=mk_id]').value = move_id
+    get_text(this,0,'mk_company')
+    get_text(this,1,'mk_name')
+    get_text(this,2,'mk_phone')
+
+
+    get_text(this,4,'mk_url')
+    get_text(this,5,'mk_memo')
+
+    reset_radio_val('mk_advtype')
+    reset_radio_val('mk_status')
+
+    var adstatus = get_val(this,3)
+    set_radio_val(adstatus,'mk_advtype')
+
+    var onstatus = get_val(this,6)
+    set_radio_val(onstatus,'mk_status')
+
+
+
+
+
+    $('.makelist').hide()
+    $('.updatelist').show()
+  })
+
+  $('.modal-background').click(function(){
+    $('.addmaketing').removeClass('is-active')
+  })
+
+  $('.do_close').click(function(){
+    $('.addmaketing').removeClass('is-active')
+  })
+
+
+
+function get_text(base,num,onname){
+var onparent = base.parentNode.parentNode.children
+var ontext = onparent[num].getElementsByTagName('span')[0]
+document.querySelector('input[name='+onname+']').value = ""
+if(ontext){
+var onreadval = ontext.innerHTML
+    document.querySelector('input[name='+onname+']').value = onreadval
+}
+return ontext
+}
+
+
+function reset_radio_val(target){
+var radio_list = document.querySelectorAll('input[name='+target+']')
+    for (var i = 0; i < radio_list.length; i++) {
+            $(radio_list[i]).attr('checked', false);
+    }
+}
+
+function onset_radio_val(target){
+var radio_list = document.querySelectorAll('input[name='+target+']')
+    for (var i = 0; i < radio_list.length; i++) {
+        if(i == 0){
+            $(radio_list[i]).attr('checked', true);
+        }else{
+            $(radio_list[i]).attr('checked', false);
+        }
+
+    }
+}
+
+function set_radio_val(val,target){
+var radio_list = document.querySelectorAll('input[name='+target+']')
+    for (var i = 0; i < radio_list.length; i++) {
+        if(radio_list[i].value == val){
+            $(radio_list[i]).attr('checked', true);
+        }
+    }
+
+}
+
+
+function get_val(base,num){
+    var onparent = base.parentNode.parentNode.children
+    var ontext = onparent[num].getElementsByTagName('span')[0]
+    var onreadval = ontext.innerHTML
+    return onreadval
+}
+
+function get_val2(base,num,onname,onlist){
+    var onparent = base.parentNode.parentNode.children
+    var ontext = onparent[num].getElementsByTagName('span')[0]
+    if(ontext){
+        var onreadval = ontext.innerHTML
+        console.log(onreadval)
+    }
+    return ontext
+}
+
+
+
+    </script>
+    {% endblock %}

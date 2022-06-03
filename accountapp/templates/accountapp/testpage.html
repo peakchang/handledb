@@ -1,0 +1,15 @@
+{% extends 'account_base.html' %}
+
+{% block accountcontent %}
+
+{% if user.is_authenticated %}
+    <p>이 유저는 로그인 되어 있습니다.</p>
+{% endif %}
+
+{% if user.is_anonymous %}
+    <p>This user is logged out</p>
+{% endif %}
+
+
+
+{% endblock %}

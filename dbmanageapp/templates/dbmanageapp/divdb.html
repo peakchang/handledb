@@ -1,0 +1,329 @@
+{% extends 'db_base.html' %}
+
+{% block dbmanage_content %}
+
+<div id="layoutSidenav_content">
+    <main>
+
+
+        <div class="container">
+
+            <!-- 검색 -->
+            <form action="" method="get">
+                <div class="pt-4">
+                    <div class="inputlist">
+                        <div class="inputflex">
+                            <div class="center_text">
+                                <input type="date" name="sd" value="{{ get_list.sd }}" class="currentDate_sd">
+                            </div>
+                            <div class="center_text">
+                                <span>~</span>
+                            </div>
+
+                            <div class="center_text">
+                                <input type="date" name="ed" value="{{ get_list.ed }}" class="currentDate_ed">
+                            </div>
+                        </div>
+
+                        <div class="inputflex">
+                            <div class="center_text">
+                                <span>마케터 :</span>
+                            </div>
+
+                            <div class="select is-small">
+                                <select name="mk" class="mk">
+                                    <option value="">선택하세요</option>
+                                    {% for mlist in marketing_list %}
+                                    <option value="{{ mlist.mk_company }}"
+                                            {% if mlist.mk_company == get_list.mk %}
+                                            selected="selected"
+                                    {% endif %}>{{ mlist.mk_company }}</option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="inputflex">
+                            <div class="center_text">
+                                <span>DB명 :</span>
+                            </div>
+
+                            <div class="select is-small">
+                                <select name="dn" class="dn">
+                                    <option value="">마케터를 선택하세요</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="inputflex">
+<!--                            <div class="select is-small">-->
+<!--                                <select>-->
+<!--                                    <option>아이디</option>-->
+<!--                                    <option>이름</option>-->
+<!--                                    <option>연락처</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
+
+<!--                            <div class="ml-1">-->
+<!--                                <input class="input is-small" type="text">-->
+<!--                            </div>-->
+                            <div class="">
+                                <button class="button is-small is-link">검색</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+
+            <!-- 검색끝 -->
+
+            <!-- 전체 DB 갯수 -->
+            <div class="dbtable_area mb-5">
+                <table class="type07">
+                    <tr>
+                        <th>DB 수량</th>
+                        <td style="color:red; font-weight:bold;  font-size:15px;" class="all_db_count">{{ db_list.count }}</td>
+                    </tr>
+
+                </table>
+            </div>
+            <!-- 전체 DB 갯수 끝 -->
+
+            <form action="" method="post">
+                {% csrf_token %}
+                <!-- DB 분배 시작 -->
+                <div class="mb-1 d-flex justify-content-between divbtn">
+                    <div class="center_text">
+                        <span>(아이디 / 이름 / 분배할 DB 수량)</span>
+                    </div>
+
+                    <div class="">
+                        <button class="button is-success is-normal is-rounded" type="submit">DB 분배하기</button>
+                    </div>
+                </div>
+
+
+                <div class="employee_list row">
+
+                    {% for ulist in userlist %}
+                    <div class="col-6 col-md-4 sepa_emp_out">
+                        <div class="sepa_emp_wrap">
+                            <div class="emp_info">
+                                <span>{{ ulist.username }}</span>
+                                <span>{{ ulist.nickname }}</span>
+                            </div>
+                            <div class="div_input">
+                                <input class="input is-small div_input_on" type="number" name="divdb[]">
+                                <input type="hidden" name="divid[]" value="{{ ulist.username }}">
+                                <input type="hidden" name="divnick[]" value="{{ ulist.nickname }}">
+                            </div>
+                        </div>
+                        <div class="d-none">
+                          <table class="type18">
+                            <tr>
+                              <th>당일 DB 분배량</th>
+                              <td class="bton">52</td>
+                              <th>미통건수</th>
+                              <td class="bton">38</td>
+                            </tr>
+                          </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" name="button" class="d-none" style="width:20px;">test</button>
+            </form>
+
+        </div>
+
+        {% if error_text %}
+        <div>
+            <span class="success tag is-danger">{{ error_text }}</span>
+        </div>
+        {% endif %}
+
+        {% for message in messages %}
+        <span
+                {% if message.tags %} class="{{ message.tags }} tag is-link" {% endif %}>{{ message }}</span>
+        {% endfor %}
+        <!-- DB 분배 끝 -->
+
+        <style>
+            .none_db_title{text-align:center; background-color:#ececec; padding: 10px 0; font-size:14px; border:1px solid #ccc; border-bottom:none;}
+            .sum_db_count{text-align:right; background-color:#ececec; padding: 10px 50px 10px 0; font-size:14px; border:1px solid #ccc; border-top:none;}
+        </style>
+        <!--        분배 전 DB 리스트-->
+        <div class="col-12 mt-5">
+            <div class="none_db_title">미분배 DB 목록</div>
+            <table class="type07">
+                <tr>
+                    <th>마케터</th>
+                    <th>DB명</th>
+                    <th>수량</th>
+                    <th>등록일</th>
+                </tr>
+
+                {% for d_arr in db_count_arr %}
+                <tr>
+                    {% for don in d_arr%}
+                    <td>{{ don }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+
+            </table>
+            <div class="sum_db_count" style="font-size:16px; font-weight:bold; color: blue;">합계 : {{ all_db_count }}</div>
+        </div>
+        <!--        분배 전 DB 리스트 끝-->
+
+        <!-- DB 분배 시간 -->
+
+</div>
+
+
+{% if onmessage %}
+메세지가 있어??
+{% endif %}
+
+</main>
+
+{% if not get_list.sd %}
+<script !src="">
+        var t_date = new Date()
+        var t_date = new Date(t_date.getFullYear(), t_date.getMonth(), 1);
+        t_date.setHours(t_date.getHours()+9)
+        var dateval = t_date.toISOString().substring(0, 10)
+        $('.currentDate_sd').val(dateval)
+
+</script>
+{% endif %}
+
+{% if not get_list.ed %}
+<script !src="">
+        var t_date = new Date()
+        t_date.setHours(t_date.getHours()+9)
+        var dateval = t_date.toISOString().substring(0, 10)
+          $('.currentDate_ed').val(dateval)
+</script>
+{% endif %}
+
+<script !src="">
+
+  var all_db_count = document.querySelector('.all_db_count');
+  var temp_all_db_count = Number(all_db_count.innerText);
+  var div_input_on = document.querySelectorAll('.div_input_on');
+
+  for (var i = 0; i < div_input_on.length; i++) {
+    div_input_on[i].addEventListener('input', function(){
+
+      if(this.value < 0){
+          alert("음수는 입력할수 없습니다.")
+          this.value = ""
+          return false;
+      }
+
+      var sum_count = 0
+      for (var i = 0; i < div_input_on.length; i++) {
+        var sum_count = sum_count + Number(div_input_on[i].value);
+      }
+
+      if(Number(temp_all_db_count) < sum_count){
+        alert('DB 수량의 값보다 더 큽니다. 다시 입력해주세요')
+        this.value = ""
+        return false;
+      }
+
+      var result_all_db_count = temp_all_db_count - sum_count
+      var change_all_db_count = document.querySelector('.all_db_count');
+      change_all_db_count.innerText = result_all_db_count
+
+    });
+  }
+
+
+  function updateValue(e) {
+    log.textContent = e.target.value;
+  }
+
+
+$('.mk').change(function(){
+
+    console.log('askldfjlasdf')
+  var mk_name = document.querySelector('.mk').value
+  var date_sd = document.querySelector('.currentDate_sd').value
+  var date_ed = document.querySelector('.currentDate_ed').value
+  var dn = document.querySelector('.dn').value
+
+  var param = {'mk_name':mk_name,'date_sd':date_sd,'date_ed':date_ed}
+
+  $.ajax({
+    url : '{% url 'dbmanage:workajax' %}',
+    type : 'POST',
+    headers : {
+      'X-CSRFTOKEN' : '{{ csrf_token }}'
+    },
+    data : JSON.stringify(param),
+    success : function(data){
+      $('.dn').empty()
+      template = `<option value=''>전체보기</option>`
+        $('.dn').append(template)
+      for (var i = 0; i < data['db_names'].length; i++) {
+      ondbname = data['db_names'][i].replace(/^(.{7}[^\s]*).*/, "$1")
+      ondbname = ondbname.replace(/^(.{7}[^\s]*).*/, "$1")
+
+
+        template = `<option value='${data['db_names'][i]}'>${ondbname}</option>`
+        $('.dn').append(template)
+      }
+    },
+    error : function(){
+      console.log('에러다!! 에러가 났다!!!')
+    }
+  })
+})
+
+
+var mk_name = document.querySelector('.mk').value
+if(mk_name){
+  var date_sd = document.querySelector('.currentDate_sd').value
+  var date_ed = document.querySelector('.currentDate_ed').value
+  var dn = document.querySelector('.dn').value
+
+  var regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/gi;
+  var ondn = "{{ get_list.dn }}"
+  var param = {'mk_name':mk_name,'date_sd':date_sd,'date_ed':date_ed}
+  $.ajax({
+    url : '{% url 'dbmanage:workajax' %}',
+    type : 'POST',
+    headers : {
+      'X-CSRFTOKEN' : '{{ csrf_token }}'
+    },
+    data : JSON.stringify(param),
+    success : function(data){
+      $('.dn').empty()
+      template = `<option value=''>전체보기</option>`
+      $('.dn').append(template)
+      for (var i = 0; i < data['db_names'].length; i++) {
+        chk_dn = data['db_names'][i].replace(regExp, "")
+        ondn = ondn.replace(regExp,'');
+        ondn = ondn.replace(/\s/g,'');
+        chk_dn = chk_dn.replace(/\s/g,'');
+        var selected = ""
+        if(ondn == chk_dn){
+          var selected = "selected='selected'"
+        }
+        ondbname = data['db_names'][i].replace(/^(.{7}[^\s]*).*/, "$1")
+        template = `<option value='${data['db_names'][i]}' ${selected}>${ondbname}</option>`
+        $('.dn').append(template)
+      }
+    },
+    error : function(){
+      console.log('에러다!! 에러가 났다!!!')
+    }
+  })
+}
+</script>
+
+{% endblock %}

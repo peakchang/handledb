@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+{% load static %}
+{% load humanize %}
+
+<html lang="ko" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet"/>
+
+    <link href="{% static 'dbstyle.css' %}?v=0.1" rel="stylesheet"/>
+
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+
+    <style media="screen">
+  table.type07 { width: 100%; border-collapse: collapse; border-left: 1px solid #ccc; font-size: 13px;}
+  table.type07 tbody th { padding: 10px; font-weight: bold; vertical-align: middle; border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; background: #ececec; text-align: center;}
+  table.type07 td { padding: 10px; vertical-align: middle;   border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; text-align:center; }
+  .none_date{border-left:1px solid #ccc; border-right:1px solid #ccc; border-bottom:1px solid #ccc; padding: 10px; text-align: center; font-size: 13px;}
+  .input_memo_wrap{height: 80%;}
+  .input_memo{width:100%; height:100%;}
+.del_btn{color:#FF5A5A; font-size:14px; cursor:pointer}
+
+
+
+
+
+
+
+
+
+
+
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <span
+                {% if message.tags %} class="{{ message.tags }} tag is-success" {% endif %}>{{ message }}</span>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <form method="post">
+        <div class="row">
+            {% csrf_token %}
+            <div class="col-12 col-md-8 mb-4">
+                <table class="type07">
+                    <tr>
+                        <th>이름</th>
+                        <td>
+
+                            <input class="input is-hovered is-small" type="text" name="customer_name" value="{{ customer_info.db_member }}" placeholder="Hovered input">
+
+
+                        </td>
+                        <th>전화번호</th>
+                        <td>{{ customer_info.db_phone }}</td>
+                    </tr>
+                    <tr>
+                        <th>현재상태</th>
+                        <td>
+                            <div class="select is-rounded is-small">
+                                <select name="status_sel">
+                                    <option value="">선택하세요</option>
+                                    {% for slist in status_list %}
+                                    <option value="{{ slist }}"
+                                            {% if slist == customer_info.db_status %}selected="selected" {% endif %}>
+                                        {{ slist }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </td>
+                        <th>담당자</th>
+                        <td>
+                            {{ customer_info.db_manager }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>나이</th>
+                        <td>
+                            {{ customer_info.db_age }}
+                        </td>
+                        <th>성별</th>
+                        <td>
+                            {{ customer_info.db_sex }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>투자금액</th>
+                        <td>
+                            {{ customer_info.db_inv }}
+                        </td>
+                        <th>등록일</th>
+                        <td>
+                            {{ customer_info.db_date|date:'y-m-d' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>총 결제금액</th>
+                        <td>
+                            {% if sum.pl_paidprice__sum %}
+                            {{ sum.pl_paidprice__sum|intcomma }}원
+                            {% else %}
+                            없음
+                            {% endif %}
+                        </td>
+                        <th>결제상태</th>
+                        <td>
+                            <select name="paystatus_sel">
+                                <option value="N">N</option>
+                                <option value="Y"
+                                        {% if customer_info.db_paidstatus == 'Y' %}selected="selected"{% endif %}>Y
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                    {% if request.user.rete == 'A' %}
+                    <tr>
+                        <th>마케터</th>
+                        <td>
+                            {{ customer_info.db_mkname.mk_company }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                </table>
+                <div class="mt-2 text-center">
+                    <button type="submit" name="sbm_button" value="update"
+                            class="button is-info is-rounded is-small mr-2" onclick="parent_reload()">수정
+                    </button>
+                    <button type="button" name="button" class="button is-danger is-rounded is-small" onclick="window.close();">닫기</button>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="input_memo_wrap">
+                    <textarea name="db_memo" class="input_memo"></textarea>
+                </div>
+                <div class="mt-2 text-center">
+                    <button type="button" name="button" class="button is-link is-rounded is-small mr-2 add_memo">메모등록
+                    </button>
+                    <button type="button" class="button is-info is-rounded is-small payment_btn">
+                        수기결제
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-md-10 col-lg-8 mx-auto payment_area mt-2">
+            <div class="d-flex">
+                <input class="input is-link is-small" name="db_payment" id="db_payment" type="text"
+                       placeholder="금액을 입력하세요">
+                <button type="submit" name="sbm_button" value="payment" class="button is-link is-small" onclick="parent_reload()">업데이트</button>
+            </div>
+        </div>
+
+
+    </form>
+
+    <script>
+
+    $('.add_memo').click(function(){
+    var now_id = {{ customer_info.id }}
+    console.log(now_id)
+    var db_memo = document.querySelector('.input_memo').value
+    if(!db_memo){
+        alert('메모를 입력해주세요')
+        return false
+    }
+    var param = {'db_memo':db_memo, 'now_id': now_id}
+    $.ajax({
+        url : '{% url 'dbmanage:workajax' %}',
+        type : 'POST',
+        headers : {
+            'X-CSRFTOKEN' : '{{ csrf_token }}'
+        },
+        data : JSON.stringify(param),
+        success : function(data){
+            console.log(data)
+            alert('메모 등록이 완료 되었습니다')
+            opener.location.reload();
+            window.location.reload()
+        },
+        error : function(){
+            console.log('에러다!! 에러가 났다!!!')
+        }
+    })
+})
+
+
+    $('.payment_area').hide()
+
+    $('.payment_btn').click(function(){
+        $('.payment_area').show()
+    })
+
+        $("#db_payment").on("keyup", function() {
+        console.log(this.value)
+        $(this).val($(this).val().replace(/[^0-9]/g,""));
+        this.value = addComma(this.value)
+   });
+
+   function addComma(data) {
+    return data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function removeCommas(data) {
+    if(!data || data.length == 0){
+    	return "";
+    }else{
+    	return x.split(",").join("");
+    }
+}
+
+
+function parent_reload(){
+    alert('업데이트가 완료되었습니다')
+    opener.location.reload();
+}
+
+
+
+
+
+
+    </script>
+
+    <!--    -->
+
+    <div class="" style="margin-top:40px;">
+        <table class="type07">
+            <tr>
+                <th>등록일</th>
+                <th>담당자</th>
+                <th>영업상담</th>
+                <th>삭제</th>
+            </tr>
+
+            {% if memo_list %}
+            {% for mlist in memo_list %}
+            <tr>
+                <td>{{ mlist.dm_date|date:'y-m-d H:i' }}</td>
+                <td>{{ mlist.dm_chkdb.db_manager }}</td>
+                <td>{{ mlist.dm_memos }}</td>
+                <td>
+                     <span class="del_btn"><i class="fa-solid fa-circle-xmark"></i></span>
+                     <input type="hidden" name="onid" value="{{ mlist.id }}">
+                </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </table>
+
+        {% if not memo_list %}
+        <div class="none_date">
+            등록된 메모가 없습니다.
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-3 mb-5">
+    <table class="type07">
+            <tr>
+                <th>결제일</th>
+                <th>결제금액</th>
+            </tr>
+
+            {% if basedb_paidlist %}
+            {% for plist in basedb_paidlist %}
+            <tr>
+                <td>{{ plist.pl_paiddate|date:'y-m-d' }}</td>
+                <td>
+                    <div class="d-flex justify-content-around align-items-center">
+
+                        <div>
+                            <input type="hidden" name="pl_paidprice" value="{{ plist.pl_paidprice }}">
+                            <button class="button is-small is-success pay_updatego" style="display:none">업데이트</button>
+                            <span class="show_price">{{ plist.pl_paidprice|intcomma   }}원</span>
+
+
+                        </div>
+
+                        {% if not request.user.rete == 'D' %}
+                        <div>
+                            <input type="hidden" name="" value="{{ plist.id }}">
+                            <button class="button is-link is-small pay_update">수정</button>
+                            <button class="button is-danger is-small pay_delete">삭제</button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </table>
+
+        {% if not memo_list %}
+        <div class="none_date">
+            등록된 메모가 없습니다.
+        </div>
+        {% endif %}
+
+
+    </div>
+</div>
+
+<script !src="">
+$('.pay_update').click(function(){
+  this.parentNode.previousElementSibling.firstElementChild.type = 'text'
+  this.parentNode.previousElementSibling.firstElementChild.nextElementSibling.style.display = 'inline-block'
+  this.parentNode.previousElementSibling.firstElementChild.nextElementSibling.nextElementSibling.style.display = 'none'
+})
+
+$('.del_btn').click(function(){
+    console.log(this.nextElementSibling.value)
+    if(confirm('삭제하시겠습니까? 삭제한 메모는 복구할수 없습니다.')){
+        param = {'del_memo_id' : this.nextElementSibling.value}
+        $.ajax({
+            url : '{% url 'dbmanage:workajax' %}',
+            type : 'POST',
+            headers : {
+              'X-CSRFTOKEN' : '{{ csrf_token }}'
+            },
+            data : JSON.stringify(param),
+            success : function(data){
+              alert('삭제가 완료되었습니다.')
+              window.location.reload()
+              opener.location.reload();
+            },
+            error : function(){
+              console.log('에러다!! 에러가 났다!!!')
+            }
+          })
+    }else{
+        console.log('삭제 노노노')
+    }
+})
+
+$('.pay_updatego').click(function(){
+  var detail_id = this.parentNode.nextElementSibling.firstElementChild.value
+  var change_price = this.previousElementSibling.value
+  param = {'detail_id' : detail_id, 'change_price': change_price}
+  $.ajax({
+    url : '{% url 'dbmanage:workajax' %}',
+    type : 'POST',
+    headers : {
+      'X-CSRFTOKEN' : '{{ csrf_token }}'
+    },
+    data : JSON.stringify(param),
+    success : function(data){
+      alert('가격 수정이 완료되었습니다.')
+      window.location.reload()
+    },
+    error : function(){
+      console.log('에러다!! 에러가 났다!!!')
+    }
+  })
+
+})
+
+
+
+$('.pay_delete').click(function(){
+  var detail_id = this.parentNode.firstElementChild.value
+  var del_val = 'del'
+  param = {'detail_id' : detail_id, 'del_val': del_val}
+  $.ajax({
+    url : '{% url 'dbmanage:workajax' %}',
+    type : 'POST',
+    headers : {
+      'X-CSRFTOKEN' : '{{ csrf_token }}'
+    },
+    data : JSON.stringify(param),
+    success : function(data){
+      alert('삭제가 완료 되었습니다')
+      window.location.reload()
+    },
+    error : function(){
+      console.log('에러다!! 에러가 났다!!!')
+    }
+  })
+})
+</script>
+</body>
+</html>

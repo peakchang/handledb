@@ -1,0 +1,57 @@
+.inputlist{display: flex; flex-wrap: wrap;}
+.inputflex{display: flex; margin-right: 10px; margin-bottom: 10px; font-size: 14px;}
+.center_text{display: flex; justify-content: flex; align-items: center; margin-right: 3px;}
+.currentDate{font-size: 12px; padding: 4px; border:1px solid #dbdbdb; border-radius: 5px;}
+a{text-decoration:none;}
+
+
+.dbtable_area{}
+
+  table.type05 { border-collapse: collapse; border-left: 1px solid #ccc; font-size: 13px;}
+  table.type05 tbody th { padding: 5px; font-weight: bold; vertical-align: middle; border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; background:#D9E5FF; text-align: center;}
+  table.type05 td { padding: 5px; vertical-align: middle;   border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; text-align:center; }
+
+
+  table.type07 { width: 100%; border-collapse: collapse; border-left: 1px solid #ccc; font-size: 13px;}
+  table.type07 tbody th { padding: 10px; font-weight: bold; vertical-align: middle; border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; background: #ececec; text-align: center;}
+  table.type07 td { padding: 10px; vertical-align: middle;   border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; text-align:center; }
+  .detail_customer{cursor: pointer;}
+
+
+  table.type08 { width: 100%; border-collapse: collapse; border-left: 1px solid #ccc; font-size: 13px;}
+  table.type08 tbody th { padding: 10px; font-weight: bold; vertical-align: middle; border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; background: #ececec; text-align: center;}
+  table.type08 td { min-width: 50px; padding: 10px; vertical-align: middle; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; text-align:center; }
+
+  table.type18 { width: 100%; border-collapse: collapse; border-left: 1px solid #ccc; font-size: 12px;}
+  table.type18 tbody th { padding: 3px; font-weight: bold; vertical-align: middle; border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; background: #ececec; text-align: center;}
+  table.type18 td { min-width: 50px; padding: 3px; vertical-align: middle; border: 1px solid #ccc;text-align:center; font-weight: bold;}
+
+
+  .div_date td{padding: 5px !important;}
+  .div_date th{padding: 5px !important;}
+
+  .emp_info{width:60%; display: flex; justify-content: space-around; align-items: center;}
+  .div_input{width:40%;}
+  .sepa_emp_out{padding: 2px; border:1px solid #D5D5D5; padding: 4px;}
+  .sepa_emp_wrap{display: flex;  margin-bottom: 4px;}
+
+  /*
+  .memo_right{position: relative;}
+  .memo_fix{position: absolute; left: 0; top:0px; z-index: 999; background-color: white; width: 100%;border:1px solid #dbdbdb; padding: 10px; border-radius: 5px; display: none;}
+  */
+  .memo_fix{display:none;}
+  .input_dbta{width:100%; height:250px;}
+
+  .excelup_tt{background-color: #ececec; text-align: center; font-size: 14px; font-weight: bold; padding: 10px; border: 1px solid #ccc; border-bottom: none;}
+  .excelup_bb{display: flex; justify-content: center; font-size: 14px; font-weight: bold; background-color: #ececec; padding: 10px; border: 1px solid #ccc; border-bottom: none;}
+  .excelup_ff{display: flex; justify-content: space-between; padding: 10px; border: 1px solid #ccc; border-bottom: none;}
+  .excelup_imginfo{border: 1px solid #ccc; padding: 10px 0; text-align: center;}
+
+  @media screen and (max-width: 768px) {
+    .table_wrap{width: 100%; overflow: auto;}
+    .table_area{width:100%; min-width: 750px;}
+    .table_area_mk{width:100%; min-width: 880px;}
+
+    .divbtn{font-size: 13px;}
+    .employee_list{font-size: 12px;}
+  }

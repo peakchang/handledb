@@ -1,0 +1,372 @@
+{% extends 'db_base.html' %}
+
+{% block dbmanage_content %}
+
+
+<div id="layoutSidenav_content">
+    <main>
+
+        <div class="container px-4 pt-4">
+            {% if not user.rete == 'A' %}
+            마스터가 아니면 들어올수 없습니다.
+            <script !src="">
+                goPage()
+            </script>
+            {% else %}
+            {% endif %}
+            <div class="inputlist">
+
+
+                <div class="inputflex">
+                    <div class="center_text">
+                        <span>리스트수 :</span>
+                    </div>
+
+                    <div class="select is-small">
+                        <select>
+                            <option>20</option>
+                            <option>50</option>
+                            <option>100</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="inputflex">
+                    <div class="center_text">
+                        <span>상태 :</span>
+                    </div>
+
+                    <div class="select is-small">
+                        <select>
+                            <option>사용</option>
+                            <option>중지</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="inputflex">
+                    <div class="center_text">
+                        <span>등급 :</span>
+                    </div>
+
+                    <div class="select is-small">
+                        <select>
+                            <option>전체</option>
+                            <option>A등급</option>
+                            <option>B등급</option>
+                            <option>C등급</option>
+                            <option>D등급</option>
+                            <option>E등급</option>
+
+                        </select>
+                    </div>
+                </div>
+
+
+                <!--        <div class="inputflex">-->
+                <!--          <div class="center_text">-->
+                <!--            <span>팀 :</span>-->
+                <!--          </div>-->
+
+                <!--          <div class="select is-small">-->
+                <!--            <select>-->
+                <!--              <option>전체</option>-->
+                <!--              <option>부천</option>-->
+                <!--              <option>의정부</option>-->
+                <!--              <option>매니저</option>-->
+                <!--            </select>-->
+                <!--          </div>-->
+                <!--        </div>-->
+
+
+                <div class="inputflex">
+                    <div class="select is-small">
+                        <select>
+                            <option>아이디</option>
+                            <option>이름</option>
+                            <option>연락처</option>
+                        </select>
+                    </div>
+
+                    <div class="ml-1">
+                        <input class="input is-small" type="text">
+                    </div>
+                    <div class="">
+                        <button class="button is-small is-link">검색</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+        <!-- ********** 검색 끝 -->
+
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="table_wrap container">
+
+                <div style="text-align:right; padding: 0 30px 10px 0;">
+                    <span class="button is-link is-small add_user">회원 추가</span>
+                    <button class="button is-primary is-small">업데이트</button>
+                </div>
+
+                <div class="mb-5 userinput" style="display:none;">
+                    <table class="type07">
+                        <tr>
+                            <th>아이디</th>
+                            <th>닉네임</th>
+                            <th>비밀번호</th>
+                            <th>submit</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="text" name="username" class="input is-info add_username">
+                            </td>
+                            <td>
+                                <input type="text" name="nickname" class="input is-info add_nickname">
+                            </td>
+                            <td>
+                                <input type="password" name="password" class="input is-info add_password">
+                            </td>
+                            <td>
+                                <span class="button is-success go_add_user">완료하기</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="table_area">
+                    <table class="type08">
+                        <tr>
+                            <th>
+                                <input type="checkbox" name="" id="" class="allchk">
+                            </th>
+                            <th>아이디</th>
+                            <th>닉네임</th>
+                            <th>등급</th>
+                            <th>상태</th>
+                            <th>가입일</th>
+                            <th>마지막로그인</th>
+                            <th>비번</th>
+                        </tr>
+
+                        {% for ulist in user_list %}
+                        {% if not ulist.is_superuser %}
+                        <tr>
+                            <td>
+                                <input type="hidden" name="idlist[]" value="{{ ulist.id }}">
+                                <input type="checkbox" name="idcount[]" value="{{ forloop.counter0 }}" class="inchk">
+                            </td>
+                            <td>{{ ulist.username }}</td>
+                            <td>
+                              <input type="text" name="manager_nick[]" value="{{ ulist.nickname }}" class="input is-info is-small onnick">
+                            </td>
+                            <td>
+                                {% if ulist.rete == 'A' %}
+                                마스터
+                                <input type="hidden" name="manager_rate[]" value="A">
+                                {% else %}
+                                <div class="select is-small">
+                                    <select name="manager_rate[]" class="status_change">
+                                        <option value="">선택하세요</option>
+                                        <option value="D" {% if ulist.rete == 'D' %}selected{% endif %}>직원</option>
+                                        <option value="C" {% if ulist.rete == 'C' %}selected{% endif %}>부관리자</option>
+                                        <option value="B" {% if ulist.rete == 'B' %}selected{% endif %}>관리자</option>
+                                    </select>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ulist.rete == 'A' %}
+                                -
+                                <input type="hidden" name="manager_status[]" value="Y">
+                                {% else %}
+                                <div class="select is-small">
+                                    <select name="manager_status[]" class="status_change">
+                                        <option value="">선택하세요</option>
+                                        <option value="Y" {% if ulist.status == 'Y' %}selected{% endif %}>활동</option>
+                                        <option value="N" {% if ulist.status == 'N' %}selected{% endif %}>비활동</option>
+                                    </select>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ ulist.date_joined|date:"y-m-d h:i" }}</td>
+                            <td>{{ ulist.last_login|date:"y-m-d h:i" }}</td>
+                            <td><span class="button is-danger is-small change_password">비번변경</span></td>
+                        </tr>
+
+                        {% endif %}
+                        {% endfor %}
+
+
+                    </table>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="modal" id="passchange_modal">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                <div class="contianer">
+                    <div class="mt-5 mb-5 px-0 px-md-5">
+                        <table class="type07">
+                            <tr>
+                                <th>아이디</th>
+                                <th>닉네임</th>
+                                <th>변경할 비밀번호</th>
+                            </tr>
+                            <tr>
+                                <td> <span class="choices_id"></span> </td>
+                                <td> <span class="choices_id"></span> </td>
+                                <td>
+                                    <input class="input is-danger is-small change_pw_input" type="text" placeholder="비밀번호 입력">
+                                    <input type="hidden" id="choices_num">
+                                </td>
+                            </tr>
+                        </table>
+                        <button class="button is-success is-small is-fullwidth mt-3 go_change_pwd">비밀번호 변경 완료하기</button>
+                    </div>
+                </div>
+            </div>
+            <button class="modal-close is-large" aria-label="close"></button>
+        </div>
+
+    </main>
+
+    <script !src="">
+
+
+
+    $('.change_password').click(function(){
+      $('#passchange_modal').addClass('is-active')
+      var thisparent = this.parentNode.parentNode
+      console.log()
+      var choices_num = thisparent.children[0].children[0].value
+      var choices_id = thisparent.children[1].innerText
+      var choices_nick = thisparent.children[2].innerText
+      $('.choices_id').empty()
+      $('.choices_id').append(choices_id)
+      $('.choices_nick').empty()
+      $('.choices_nick').append(choices_nick)
+      document.querySelector('#choices_num').value = choices_num
+
+    })
+
+    $('.modal-background,.modal-close').click(function(){
+      $('#passchange_modal').removeClass('is-active')
+    })
+
+
+    $('.go_change_pwd').click(function(){
+      var change_pw_input = document.querySelector('.change_pw_input').value
+      if(change_pw_input.length < 4){
+          alert('비밀번호가 너무 짧습니다! 4자리 이상으로 입력해주세요!')
+          return false;
+      }
+      var choices_num = document.querySelector('#choices_num').value
+      param = {'change_pw_input': change_pw_input, 'choices_num': choices_num}
+
+      $.ajax({
+          url : '{% url 'dbmanage:workajax' %}',
+          type : 'POST',
+          headers : {
+              'X-CSRFTOKEN' : '{{ csrf_token }}'
+          },
+          data : JSON.stringify(param),
+          success : function(data){
+              console.log(data)
+              alert('비밀번호 변경이 완료되었습니다.')
+              location.reload();
+          },
+          error : function(){
+              console.log('에러다!! 에러가 났다 요기 아님???!!!')
+          }
+      })
+
+    })
+
+
+
+    $('.add_user').click(function(){
+        $('.userinput').toggle()
+    })
+
+
+
+
+    $('.go_add_user').click(function(){
+
+        var add_username = document.querySelector('.add_username').value
+        var add_nickname = document.querySelector('.add_nickname').value
+        var add_password = document.querySelector('.add_password').value
+
+        if(!add_username){
+            alert('아이디를 입력해주세요!')
+            return false;
+        }
+
+        if(!add_nickname){
+            alert('닉네임을 입력해주세요!')
+            return false;
+        }
+
+        if(add_password.length < 4){
+            alert('비밀번호가 너무 짧습니다! 4자리 이상으로 입력해주세요!')
+            return false;
+        }
+
+        param = {'add_username': add_username, 'add_nickname': add_nickname, 'add_password': add_password}
+        console.log(param)
+        $.ajax({
+            url : '{% url 'dbmanage:workajax' %}',
+            type : 'POST',
+            headers : {
+                'X-CSRFTOKEN' : '{{ csrf_token }}'
+            },
+            data : JSON.stringify(param),
+            success : function(data){
+                alert('정상적으로 가입 되었습니다.')
+                location.reload();
+            },
+            error : function(){
+                alert('아이디 또는 닉네임 중복입니다. 확인해주세요')
+            }
+        })
+    })
+
+    $('.status_change').change(function(){
+
+    })
+
+    $('.onnick').focus(function(){
+      this.parentNode.parentNode.children[0].children[1].checked = true
+    })
+
+
+
+
+
+
+    var mainurl = '{% url 'home' %}'
+    console.log(mainurl)
+    function goPage() {
+        alert('마스터만 입장 가능합니다.')
+        location.href= mainurl;
+    }
+
+    $('.allchk').change(function(e){
+        if(this.checked == true){
+              $('.inchk').attr("checked", true);
+        }else{
+              $('.inchk').attr("checked", false);
+        }
+    })
+
+    </script>
+
+
+
+    {% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'db_base.html' %}
+
+{% block dbmanage_content %}
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container mt-5">
+
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <table class="type07">
+                    <tr>
+                        <th>회사명</th>
+                        <td>
+                            <input class="input" type="text" name="company_name" value="{{ set_content.company_name }}" placeholder="회사명을 입력하세요">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>상태값 생성 및 수정</th>
+                        <td>
+                            <input class="input" type="text" name="ds_status" value="{{ set_content.ds_status }}" placeholder="상태값을 입력하세요">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>결제 기준 상태값</th>
+                        <td style="text-align:left;">
+                            {% if select_menu %}
+                            <div class="select is-info" >
+                                <select name="ds_statusbase">
+                                    <option value="">결제 기준값을 선택하세요</option>
+                                    {% for blist in select_menu %}
+                                    <option value="{{ blist }}" {% if set_content.ds_statusbase == blist %}selected{% endif %}>{{ blist }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% else %}
+                            <span>상태값을 생성 및 업데이트해주세요!</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>테마</th>
+                        <td style="text-align:left;">
+                            <div class="select is-info" >
+                                <select name="theme_status">
+                                    <option value="dark" {% if ot == "dark" %} selected {% endif %}>다크테마</option>
+                                    <option value="light" {% if ot == "light" %} selected {% endif %}>라이트테마</option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>로고 이미지</th>
+                        <td>
+                            <div class="file has-name is-fullwidth">
+                                <label class="file-label">
+                                    <input class="file-input logo_image" type="file" name="logo_image">
+                                    <span class="file-cta">
+                                        <span class="file-icon"><i class="fas fa-upload"></i></span>
+                                        <span class="file-label"> 이미지를 선택하세요 </span>
+                                    </span>
+                                    <span class="file-name logo_image_name"></span>
+                                </label>
+                            </div>
+                            <div style="text-align:left; max-width:200px; margin-top:10px;">
+                                {% if set_content.logo_image %}
+                                <img src="{{ set_content.logo_image.url }}" alt="">
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+
+                </table>
+
+                <div class="col-12 col-md-9 col-lg-6 mx-auto">
+                    <button class="button is-info is-fullwidth mt-4">업데이트</button>
+                </div>
+
+            </form>
+
+            {% for message in messages %}
+            <span
+                    {% if message.tags %} class="{{ message.tags }} tag is-success" {% endif %}>{{ message }}</span>
+            {% endfor %}
+
+
+
+        </div>
+    </main>
+
+    <script>
+
+    $('.logo_image').change(function(){
+        if (this.files.length > 0) {
+            var fileName = document.querySelector('.logo_image_name');
+            fileName.textContent = this.files[0].name;
+        }
+    })
+
+    </script>
+    {% endblock %}

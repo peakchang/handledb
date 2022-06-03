@@ -1,0 +1,62 @@
+{% extends 'account_base.html' %}
+
+{% block accountcontent %}
+
+<style>
+    #layoutAuthentication_content{background-color:#0d6efd;}
+
+
+</style>
+
+
+<div id="layoutAuthentication">
+    <div id="layoutAuthentication_content">
+        <main>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-9 col-lg-6 mx-auto">
+                        <div class="card shadow-lg border-0 rounded-lg mt-5">
+                            <div class="card-header"><h3 class="text-center font-weight-light my-4">로그인</h3></div>
+                            <div class="card-body">
+                                <form method="post">
+
+                                    {% if error %}
+                                    <div class="mt-1 mb-3" style="font-size:14px; color:red;">{{ error }}</div>
+                                    {% endif %}
+                                    {% csrf_token %}
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputUsername" type="username" name="username"
+                                               placeholder="name@example.com"/>
+                                        <label for="inputUsername">아이디를 입력하세요</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="inputPassword" type="password" name="password"
+                                               placeholder="Password"/>
+                                        <label for="inputPassword">비밀번호를 입력하세요</label>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <input type="submit" class="btn btn-primary" value="로그인">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="card-footer text-center py-3">
+                                <div class="small"><a href="{% url 'accountapp:signup' %}">회원가입 바로가기</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<button class="testbtn">
+    asdfasdf
+</button>
+
+<script !src="">
+
+
+</script>
+
+{% endblock %}

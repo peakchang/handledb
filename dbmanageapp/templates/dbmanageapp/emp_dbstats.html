@@ -1,0 +1,248 @@
+{% extends 'db_base.html' %}
+
+{% block dbmanage_content %}
+{% load humanize %}
+
+<style>
+    .payment_wrap{}
+    .payment_list{display:none;}
+    .payment_toggle{cursor:pointer}
+    .payment_on{display:flex; justify-content:center;}
+</style>
+
+
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container">
+
+            <!-- 검색 -->
+            <div class="pt-4">
+                <form action="" method="get">
+                    <div class="inputlist">
+
+                        <div class="inputflex">
+                            <div class="center_text">
+                                <input type="date" name="sd" value="{{ get_list.sd }}" class="currentDate_sd">
+                            </div>
+                            <div class="center_text">
+                                <span>~</span>
+                            </div>
+
+                            <div class="center_text">
+                                <input type="date" name="ed" value="{{ get_list.ed }}" class="currentDate_ed">
+                            </div>
+                        </div>
+
+                        <div class="inputflex">
+                            <div class="center_text">
+                                <span>갯수 :</span>
+                            </div>
+
+                            <div class="select is-small">
+                                <select name="wp">
+                                    <option value="10"
+                                            {% if get_list.wp == '10' %}selected="selected" {% endif %}>
+                                    10
+                                    </option>
+                                    <option value="20"
+                                            {% if get_list.wp == '20' %}selected="selected" {% endif %}>
+                                    20
+                                    </option>
+                                    <option value="50"
+                                            {% if get_list.wp == '50' %}selected="selected" {% endif %}>
+                                    50
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="inputflex">
+                            <input type="text" class="input is-link is-small" name="ps" value="{{ get_list.ps }}" id="" placeholder="전화번호 입력">
+                            <button class="button is-small is-link">검색</button>
+                        </div>
+
+                        <a href="{% url 'dbmanage:sale_st' %}" class="button is-small is-warning">초기화</a>
+                    </div>
+
+
+            </div>
+            </form>
+
+            <!-- ******************************검색끝 -->
+
+
+            <!-- **************************결과값 출력 -->
+
+            <div class="mt-5 table_wrap">
+                {% for message in messages %}
+                <span
+                        {% if message.tags %} class="{{ message.tags }} tag is-danger mb-2" {% endif %}>{{ message }}</span>
+                {% endfor %}
+
+                <div class="table_area">
+                    <table class="type07">
+                        <tr>
+                            <th>이름</th>
+                            <th>전화번호</th>
+                            <th>결제상태</th>
+                            <th>결제금액</th>
+                            <th>결제건수</th>
+                            <th>담당자</th>
+                            <th>마케터</th>
+                            <th>결제일</th>
+                        </tr>
+
+                        {% for dlist in base_db %}
+
+                        <tr>
+                            <td>
+                                <a class="detail_customer" href="{% url 'dbmanage:detail_customer' id=dlist.id %}"
+                                   onclick="window.open(this.href,'회원정보','width=800, height=800'); return false;">
+                                    <span>{{ dlist.db_member }}</span>
+                                </a>
+                            </td>
+                            <td> <span class="phnum">{{ dlist.db_phone }}</span></td>
+                            <td>{{ dlist.db_paidstatus }}</td>
+                            <td>{{ dlist.db_paidprice|intcomma }}원</td>
+                            <td>
+                                <div class="payment_wrap">
+                                    <span>{{ dlist.plchkdb.all.count }}건 / </span> <span class="payment_toggle">(상세보기)</span>
+                                    <div class="payment_list">
+                                        {% for plist in dlist.plchkdb.all %}
+                                        <div class="payment_on">
+                                            <div>{{ plist.pl_paidprice|intcomma }}원&nbsp;/&nbsp;</div>
+                                            <div> {{ plist.pl_paiddate|date:"m.d h:i" }}</div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+
+                            </td>
+                            <td>{{ dlist.db_manager_nick }}</td>
+                            <td>{{ dlist.db_mkname.mk_company }}</td>
+                            <td>{{ dlist.db_lastpaiddate|date:'y-m-d H:i' }}</td>
+                        </tr>
+                        {% endfor %}
+
+
+                    </table>
+                </div>
+
+            </div>
+
+            <div class="mt-3">
+                <table class="type07">
+                    <tr>
+                        <th>결제 합계</th>
+                        <td>{{ sum.db_paidprice__sum|intcomma }}원</td>
+                    </tr>
+                </table>
+            </div>
+
+            <nav class="pagination mt-2" role="navigation" aria-label="pagination">
+                <ul class="pagination-list" style="justify-content:center;">
+                    {% for paging in pageval %}
+
+                    {% if paging == get_page_num %}
+                    <li>
+                        <a class="pagination-link is-current ch_a" aria-current="page">{{ paging }}</a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <a class="pagination-link ch_a" href="?page={{ paging }}">{{ paging }}</a>
+                    </li>
+                    {% endif %}
+
+                    {% endfor %}
+                </ul>
+            </nav>
+
+            <!--        ************************결과값 출력 끝-->
+
+
+        </div>
+
+
+    </main>
+    <script !src="">
+
+    $('.payment_toggle').click(function(){
+        console.log()
+        $(this.nextElementSibling).toggle()
+    })
+    //$(document).click(function(){
+    //   $('.payment_list').hide()
+    //})
+
+    var phnum = document.querySelectorAll('.phnum')
+    for (var i = 0; i < phnum.length; i++) {
+        var tempval = phnum[i].innerText
+        var tempval = phoneformat(tempval)
+        $(phnum[i]).empty()
+        $(phnum[i]).append(tempval)
+    }
+
+    function phoneformat(num){
+        return num.replace(/(^02.{0}|^01.{1}|^[0-9]{3})([0-9]*)([0-9]{4})/, "$1-$2-$3");
+    }
+
+     var search = location.search.substring(1);
+        var searchObj = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+        var objtoarr = Object.entries(searchObj)
+        var href_val = ""
+        for (var i = 0; i < objtoarr.length; i++) {
+            if(objtoarr[i][0] == 'page'){
+                continue
+            }
+            var test = objtoarr[i].join('=')
+            if(i == 0){
+                href_val += "?"
+            } else {
+                href_val += "&"
+            }
+            href_val += test
+        }
+
+    </script>
+    {% for paging in pageval %}
+    <script !src="">
+    if(href_val){
+        var page_num = {{ forloop.counter0 }}
+        var paging = {{ paging }}
+
+        var ii = $('.ch_a').eq(page_num).attr("href", href_val+"&page="+paging)
+    }
+
+    </script>
+    {% endfor %}
+
+
+    {% if not get_list.sd %}
+    <script !src="">
+        var t_date = new Date()
+        var t_date = new Date(t_date.getFullYear(), t_date.getMonth(), 1);
+        t_date.setHours(t_date.getHours()+9)
+        var dateval = t_date.toISOString().substring(0, 10)
+        $('.currentDate_sd').val(dateval)
+
+    </script>
+    {% endif %}
+
+    {% if not get_list.ed %}
+    <script !src="">
+        var t_date = new Date()
+        t_date.setHours(t_date.getHours()+9)
+        var dateval = t_date.toISOString().substring(0, 10)
+          $('.currentDate_ed').val(dateval)
+
+    </script>
+    {% endif %}
+
+
+    <script !src="">
+
+
+
+    </script>
+    {% endblock %}

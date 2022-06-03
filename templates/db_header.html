@@ -1,0 +1,144 @@
+<body class="sb-nav-fixed">
+<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+    <!-- Sidebar Toggle-->
+    <button class="btn btn-link btn-sm order-0 ms-2 ms-lg-5" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Navbar Brand-->
+
+    {% if base_logo %}
+
+    <a href="{% url 'home' %}" id="logo_image_area" style="max-width:120px; margin:0 20px;">
+        <img src="{{ base_logo.url }}" alt="">
+    </a>
+    {% else %}
+    <a class="navbar-brand ps-3" href="{% url 'home' %}">Logo</a>
+    {% endif %}
+
+
+    <!-- Navbar-->
+    <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="#!">회원정보(준비중)</a></li>
+                <li>
+                    <hr class="dropdown-divider"/>
+                </li>
+                <li><a class="dropdown-item" href="{% url 'accountapp:logout' %}">로그아웃</a></li>
+            </ul>
+        </li>
+    </ul>
+
+    {% if request.user.is_authenticated %}
+    <span style="color:white; display:inline-block;" class="mr-5 mr-md-1">{{ request.user.nickname }}님 </span> <span class="d-none d-md-inline" style="color:white;">반갑습니다</span>
+    {% endif %}
+</nav>
+
+<!--sb-sidenav-light-->
+<div id="layoutSidenav">
+    <div id="layoutSidenav_nav">
+
+        {% if base_theme == 'dark' %}
+        <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        {% else %}
+        <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+        {% endif %}
+            <div class="sb-sidenav-menu">
+                <div class="nav">
+                    {% if request.user.rete == "A" %}
+                    <div class="sb-sidenav-menu-heading">관리자 메뉴</div>
+                    <a class="nav-link" href="{% url 'dbmanage:base_setting' %}">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-gear"></i></div>
+                        기본 설정
+                    </a>
+                    <a class="nav-link" href="{% url 'dbmanage:accountmanagement' %}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                        전체 계정관리
+                    </a>
+
+                    <a class="nav-link" href="{% url 'dbmanage:markerlist' %}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                        마케터 리스트
+                    </a>
+
+                    <a class="nav-link" href="{% url 'dbmanage:newdbup' %}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-file-circle-plus"></i></div>
+                        신규DB 등록
+                    </a>
+
+                    <a class="nav-link" href="{% url 'dbmanage:divdb' %}">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-land-mine-on"></i></div>
+                        DB 분배
+                    </a>
+
+                    <a class="nav-link" href="{% url 'dbmanage:alldblist' %}">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-list-check"></i></div>
+                        전체 DB 리스트
+                    </a>
+
+                    <a class="nav-link" href="{% url 'dbmanage:sale_st' %}">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-signal"></i></div>
+                        결제리스트
+                    </a>
+
+                    <a class="nav-link" href="{% url 'dbmanage:status_stats' %}">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-signal"></i></div>
+                        관리 통계
+                    </a>
+
+                    <a class="nav-link" href="{% url 'dbmanage:marketer_stats' %}">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-signal"></i></div>
+                        마케터 통계
+                    </a>
+                    {% endif %}
+
+                    <div class="sb-sidenav-menu-heading">직원 메뉴</div>
+                    <a class="nav-link" href="{% url 'dbmanage:emp_dblist' %}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                        DB 리스트
+                    </a>
+
+                    <a class="nav-link" href="{% url 'dbmanage:emp_dbstats' %}">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-signal"></i></div>
+                        결제리스트
+                    </a>
+
+
+                </div>
+
+            </div>
+            <div class="sb-sidenav-footer">
+
+                {% if base_company_name %}
+                <div class="small">certified as</div>
+                {{ base_company_name }}
+                {% else %}
+                회사명을 설정하세요
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+
+    <script type="text/javascript">
+var om_param = getParameterByName('om'); // 1060192
+if(om_param == 'on'){
+  $('#collapseLayouts').addClass('show')
+}
+var om_param = getParameterByName('mm'); // 1060192
+if(om_param == 'on'){
+  $('#collapsePages').addClass('show')
+}
+
+
+
+function getParameterByName(name) {
+  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+  results = regex.exec(location.search);
+  return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+
+    </script>

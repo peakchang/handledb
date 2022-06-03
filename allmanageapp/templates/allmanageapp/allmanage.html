@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <link href="{% static 'base_style.css' %}?v={{ base_time }}" rel="stylesheet"/>
+    <link href="{% static 'dbstyle.css' %}?v={{ base_time }}" rel="stylesheet"/>
+</head>
+<body>
+<div class="container mt-5">
+    <form action="" method="post">
+        {% csrf_token %}
+        <table class="type07">
+            <tr>
+                <th>샘플 엑셀파일</th>
+                <td>
+                    <div class="file is-info is-small has-name is-fullwidth excelfile">
+                        <label class="file-label">
+                            <input class="file-input" type="file" name="sample_exl" accept=".xls,.xlsx">
+                            <span class="file-cta">
+                                <span class="file-icon"><i class="fas fa-upload"></i></span>
+                                <span class="file-label">파일 올리기</span>
+                            </span>
+                            <span class="file-name">클릭해서 파일을 올려주세요</span>
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>샘플 이미지</th>
+                <td>
+                    <div class="file is-danger is-small has-name is-fullwidth imagefile">
+                        <label class="file-label">
+                            <input class="file-input" type="file" name="sample_img"">
+                            <span class="file-cta">
+                                <span class="file-icon"><i class="fas fa-upload"></i></span>
+                                <span class="file-label">파일 올리기</span>
+                            </span>
+                            <span class="file-name">클릭해서 파일을 올려주세요</span>
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>종료 시점</th>
+                <td>
+                    <input type="date" name="end_date" id="">
+                </td>
+            </tr>
+            <tr>
+                <th>현재 상태</th>
+                <td>
+                    <select name="nowstatus" id="">
+                        <option value="Y">운영중</option>
+                        <option value="Y">미운영중</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        {% if request.is_superuser %}
+        <button class="button is-link is-fullwidth mt-5">입력 고고시이이~</button>
+        {% endif %}
+        <button class="button is-link is-fullwidth mt-5">입력 고고시이이~</button>
+    </form>
+</div>
+
+<script !src="">
+    const fileInput = document.querySelector('.excelfile input[type=file]');
+    fileInput.onchange = () => {
+
+        if (fileInput.files.length > 0) {
+              const fileName = document.querySelector('.excelfile .file-name');
+              fileName.textContent = fileInput.files[0].name;
+              console.log(fileName.textContent)
+              var goinput_filename = fileName.textContent
+              var goinput_filename = goinput_filename.trim().replace(/(.xls|.xlsx)$/,'');
+              console.log(goinput_filename)
+        }
+    }
+
+    const imgfileInput = document.querySelector('.imagefile input[type=file]');
+    imgfileInput.onchange = () => {
+        console.log('aldsjflajfd')
+        if (imgfileInput.files.length > 0) {
+              const fileName = document.querySelector('.imagefile .file-name');
+              fileName.textContent = imgfileInput.files[0].name;
+              console.log(fileName.textContent)
+              var goinput_filename = fileName.textContent
+              var goinput_filename = goinput_filename.trim().replace(/(.xls|.xlsx)$/,'');
+              console.log(goinput_filename)
+        }
+    }
+</script>
+</body>
+</html>
