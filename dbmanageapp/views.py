@@ -15,7 +15,7 @@ import re
 
 from django.contrib import messages
 from django.db.models import Q, Sum
-from django.http import JsonResponse, Http404, HttpResponseRedirect
+from django.http import JsonResponse, Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -28,6 +28,17 @@ from openpyxl import load_workbook
 
 from dateutil.relativedelta import *
 
+
+def update_db(request):
+    chk_db_list = DbMemo.objects.all()
+    for dlist in chk_db_list:
+        if dlist.dm_manager == "":
+            dlist.dm_manager = dlist.dm_chkdb.db_manager
+            dlist.save()
+
+    print('완료우!')
+
+    return HttpResponse('완료가 잘 되었는지 봅시다.')
 
 @login_required
 def dbmainpage(request):
@@ -485,7 +496,7 @@ def sale_st(request):
     get_list = {}
     geton = get_getlist(request, q, j)
 
-    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+    q.add(Q(db_lastpaiddate__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
     j.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
 
     q.add(Q(db_paidstatus='Y'), q.AND)
@@ -493,7 +504,7 @@ def sale_st(request):
 
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
-    base_db = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-id')[pagenum[0]:pagenum[1]]
+    base_db = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-db_lastpaiddate')[pagenum[0]:pagenum[1]]
 
     sum = UploadDb.objects.filter(q).aggregate(Sum('db_paidprice'))
     if not sum['db_paidprice__sum']:
@@ -735,17 +746,22 @@ def newdbup(request):
             temp_mkt = MarketingList.objects.get(mk_company=dbn_mkname)
 
             # DB에 값 넣기
+
+            # 중복항목 검사할 전체 쿼리 값
+            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]])
+            overlap_count = 0
+
             for dbval in dblist:
                 if len(dbval) < 6:
                     set_arr_count = 6 - len(dbval)
                     for i in range(set_arr_count):
                         dbval.append('')
-
-
-                # 창현이거 테스트
-                # chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]], db_phone=dbval[0])
-                # if len(chk_db_list) > 0:
-                #     continue
+                try:
+                    if chk_db_list.get(db_phone=dbval[0]):
+                        overlap_count += 1
+                        continue
+                except:
+                    pass
 
                 db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
                                  db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
@@ -756,50 +772,14 @@ def newdbup(request):
                     memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[5])
                     memoup.save()
 
-
-
-            overlap_db = []
-
-            print('중복찾기 시작!')
-            # 쌩 업로드 완료! DB 중복 체크 시작!
-            lastSeenId = float('Inf')
-            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('db_phone')
-            print(chk_db_list)
-            print('체크 DB 리스트!!!')
-            for row in chk_db_list:
-                print(row)
-                print(lastSeenId)
-                if row.db_phone == lastSeenId:
-                    print(lastSeenId)
-                    row.delete()
-                else:
-                    lastSeenId = row.db_phone
-
-
-            # 업로드된 DB를 가지고 전체를 돌면서 중복항목 제거!!!
-            # for chk in chk_db_list:
-            #     overlap_chk = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]],db_phone=chk.db_phone)
-            #     if overlap_chk.count() > 1:
-            #         del_count = 0
-            #         for del_chk in overlap_chk:
-            #             del_count += 1
-            #             if del_count == 1:
-            #                 continue
-            #             else:
-            #                 del_chk.delete()
-
-        # chk_overlap_db = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]], db_phone=dbval[0])
-        #
-        # if chk_overlap_db:
-        #     overlap_count += 1
-        #     if len(dblist) == overlap_count:
-        #         temp_udb.delete()
-        #         overlap = "모든 항목이 중복됩니다. 같은 파일이 업로드 된것 같습니다."
-        #     elif overlap_count:
-        #         overlap = f"{overlap_count} 건이 중복되었습니다."
-        #     else:
-        #         overlap = ""
-            messages.success(request, f"DB 업로드가 완료 되었습니다.")
+            if len(dblist) == overlap_count:
+                temp_udb.delete()
+                overlap = "모든 항목이 중복됩니다. 같은 파일이 업로드 된것 같습니다."
+            elif overlap_count:
+                overlap = f"{overlap_count} 건이 중복되었습니다."
+            else:
+                overlap = ""
+            messages.success(request, f"DB 업로드가 완료 되었습니다. {overlap}")
         except:
             error_message = "업로드 요청된 DB가 없습니다. DB를 입력해주세요"
             return render(request, 'dbmanageapp/newdbup.html',
@@ -808,6 +788,11 @@ def newdbup(request):
 
     positive = float("inf")
     print(positive)
+
+    chk_db_list = UploadDb.objects.all()
+
+    print(chk_db_list.get(db_phone='01085258525'))
+
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 
@@ -861,8 +846,10 @@ def detail_customer(request, id):
             payment_sel = request.POST.get('paystatus_sel')
             customer_name = request.POST.get('customer_name')
             db_memo = request.POST.get('db_memo')
+            db_manager = request.POST.get('ondb_manager')
+
             if db_memo:
-                DbMemo.objects.create(dm_chkdb=db_status, dm_memos=db_memo)
+                DbMemo.objects.create(dm_chkdb=db_status, dm_memos=db_memo, dm_manager=db_manager)
 
             db_status.db_status = status_sel
             db_status.db_paidstatus = payment_sel

@@ -68,7 +68,7 @@
                         <td>
 
                             <input class="input is-hovered is-small" type="text" name="customer_name" value="{{ customer_info.db_member }}" placeholder="Hovered input">
-
+                            <input type="hidden" name="ondb_manager" value="{{ customer_info.db_manager }}">
 
                         </td>
                         <th>전화번호</th>
@@ -142,25 +142,26 @@
                     </tr>
                     {% endif %}
                 </table>
-                <div class="mt-2 text-center">
-                    <button type="submit" name="sbm_button" value="update"
-                            class="button is-info is-rounded is-small mr-2" onclick="parent_reload()">수정
-                    </button>
-                    <button type="button" name="button" class="button is-danger is-rounded is-small" onclick="window.close();">닫기</button>
-                </div>
             </div>
             <div class="col-12 col-md-4">
                 <div class="input_memo_wrap">
                     <textarea name="db_memo" class="input_memo"></textarea>
                 </div>
-                <div class="mt-2 text-center">
-                    <button type="button" name="button" class="button is-link is-rounded is-small mr-2 add_memo">메모등록
-                    </button>
-                    <button type="button" class="button is-info is-rounded is-small payment_btn">
-                        수기결제
-                    </button>
-                </div>
+<!--                <div class="mt-2 text-center">-->
+<!--                    <button type="button" name="button" class="button is-link is-rounded is-small mr-2 add_memo">메모등록-->
+<!--                    </button>-->
+<!--                </div>-->
             </div>
+            <div class="mt-2 text-center">
+            <button type="submit" name="sbm_button" value="update"
+                    class="button is-success is-rounded is-small mr-2" onclick="parent_reload()">등록 및 수정
+            </button>
+
+            <button type="button" class="button is-info is-rounded is-small payment_btn mr-2">
+                수기결제
+            </button>
+            <button type="button" name="button" class="button is-danger is-rounded is-small " onclick="window.close();">닫기</button>
+        </div>
 
         </div>
 
@@ -259,7 +260,7 @@ function parent_reload(){
             {% for mlist in memo_list %}
             <tr>
                 <td>{{ mlist.dm_date|date:'y-m-d H:i' }}</td>
-                <td>{{ mlist.dm_chkdb.db_manager }}</td>
+                <td>{{ mlist.dm_manager }}</td>
                 <td>{{ mlist.dm_memos }}</td>
                 <td>
                      <span class="del_btn"><i class="fa-solid fa-circle-xmark"></i></span>
