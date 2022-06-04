@@ -765,7 +765,6 @@ def newdbup(request):
             print(chk_db_list)
             for row in chk_db_list:
                 if row.db_phone == lastSeenId:
-
                     overlap_db.append(row)
                     print(row)
                     print(row.db_phone)
@@ -773,7 +772,6 @@ def newdbup(request):
                     row.delete()
                 else:
                     lastSeenId = row.db_phone
-
 
 
             # 업로드된 DB를 가지고 전체를 돌면서 중복항목 제거!!!
@@ -787,18 +785,6 @@ def newdbup(request):
             #                 continue
             #             else:
             #                 del_chk.delete()
-
-
-
-
-
-
-
-
-
-
-
-
 
         # chk_overlap_db = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]], db_phone=dbval[0])
         #
