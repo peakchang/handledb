@@ -757,12 +757,20 @@ def newdbup(request):
                     memoup.save()
 
 
+
             overlap_db = []
+
+            print('중복찾기 시작!')
             # 쌩 업로드 완료! DB 중복 체크 시작!
-            lastSeenId = float('-Inf')
-            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('id')
+            lastSeenId = float('Inf')
+            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('db_phone')
+            print(chk_db_list)
+            print('체크 DB 리스트!!!')
             for row in chk_db_list:
+                print(row)
+                print(lastSeenId)
                 if row.db_phone == lastSeenId:
+                    print(lastSeenId)
                     row.delete()
                 else:
                     lastSeenId = row.db_phone
@@ -797,6 +805,9 @@ def newdbup(request):
             return render(request, 'dbmanageapp/newdbup.html',
                           {'marketing_list': marketing_list, 'sample_list': sample_list,
                            'error_message': error_message})
+
+    positive = float("inf")
+    print(positive)
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 
