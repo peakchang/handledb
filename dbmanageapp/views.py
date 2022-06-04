@@ -759,16 +759,10 @@ def newdbup(request):
 
             overlap_db = []
             # 쌩 업로드 완료! DB 중복 체크 시작!
-            lastSeenId = float('-Inf')
-            print(lastSeenId)
-            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('db_phone')
-            print(chk_db_list)
+            lastSeenId = float('Inf')
+            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('id')
             for row in chk_db_list:
                 if row.db_phone == lastSeenId:
-                    overlap_db.append(row)
-                    print(row)
-                    print(row.db_phone)
-                    print(lastSeenId)
                     row.delete()
                 else:
                     lastSeenId = row.db_phone
@@ -803,7 +797,7 @@ def newdbup(request):
             return render(request, 'dbmanageapp/newdbup.html',
                           {'marketing_list': marketing_list, 'sample_list': sample_list,
                            'error_message': error_message})
-    return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list, 'overlap_db':overlap_db})
+    return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 
 # **********************************
