@@ -10,7 +10,7 @@ admin.site.register(UploadDbName)
 
 # admin.site.register(UploadDb)
 class Chk_updb(admin.ModelAdmin):
-    list_display = ('db_phone', 'db_date')
+    list_display = ('id', 'db_phone', 'db_date')
 admin.site.register(UploadDb,Chk_updb)
 
 admin.site.register(DbSetting)
