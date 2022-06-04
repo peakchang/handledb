@@ -35,7 +35,7 @@ def update_db(request):
         if dlist.dm_manager == "":
             dlist.dm_manager = dlist.dm_chkdb.db_manager
             dlist.save()
-
+            
     print('완료우!')
 
     return HttpResponse('완료가 잘 되었는지 봅시다.')
