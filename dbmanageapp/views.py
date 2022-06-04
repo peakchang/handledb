@@ -648,6 +648,8 @@ def newdbup(request):
     except:
         sample_list = ""
 
+    overlap_db = []
+
     if request.method == 'POST':
         now = datetime.now()
         before_three_week = now - timedelta(weeks=3)
@@ -754,6 +756,8 @@ def newdbup(request):
                     memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[5])
                     memoup.save()
 
+
+            overlap_db = []
             # 쌩 업로드 완료! DB 중복 체크 시작!
             lastSeenId = float('-Inf')
             print(lastSeenId)
@@ -761,10 +765,14 @@ def newdbup(request):
             print(chk_db_list)
             for row in chk_db_list:
                 if row.db_phone == lastSeenId:
-                    print(row.db_phone)
-                    print(lastSeenId)
-                    row.delete()
-                    print('ljj')
+
+                    overlap_db.append(row)
+                    print(row)
+
+
+                    # print(row.db_phone)
+                    # print(lastSeenId)
+                    # row.delete()
                 else:
                     lastSeenId = row.db_phone
 
@@ -811,7 +819,7 @@ def newdbup(request):
             return render(request, 'dbmanageapp/newdbup.html',
                           {'marketing_list': marketing_list, 'sample_list': sample_list,
                            'error_message': error_message})
-    return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
+    return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list, 'overlap_db':overlap_db})
 
 
 # **********************************
