@@ -761,7 +761,7 @@ def newdbup(request):
             # 쌩 업로드 완료! DB 중복 체크 시작!
             lastSeenId = float('-Inf')
             print(lastSeenId)
-            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('db_phone')
+            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]]).order_by('id')
             print(chk_db_list)
             for row in chk_db_list:
                 if row.db_phone == lastSeenId:
