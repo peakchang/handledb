@@ -35,9 +35,6 @@ def update_db(request):
         if dlist.dm_manager == "":
             dlist.dm_manager = dlist.dm_chkdb.db_manager
             dlist.save()
-            
-    print('완료우!')
-
     return HttpResponse('완료가 잘 되었는지 봅시다.')
 
 @login_required
@@ -88,8 +85,6 @@ def base_setting(request):
         ds_statusbase = request.POST.get('ds_statusbase')
         theme_status = request.POST.get('theme_status')
         set_model = DbSetting.objects.last()
-
-        print()
 
         if set_model:
             set_model.company_name = company_name
@@ -251,8 +246,6 @@ def alldblist(request):
 
     if request.method == 'POST':
 
-        print(request.POST['submit_btn'])
-
         list_num = request.POST.getlist('listcount[]')
         list_id = request.POST.getlist('listid[]')
         change_status = request.POST.getlist('change_status[]')
@@ -260,7 +253,6 @@ def alldblist(request):
         change_manager_nick = request.POST['change_manager_nick']
 
         if 'update' in request.POST['submit_btn']:
-            print('업데이트에여~~~~')
             for val in list_num:
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
                 temp_item.db_status = change_status[int(val)]
@@ -269,15 +261,12 @@ def alldblist(request):
                     temp_item.db_manager_nick = change_manager_nick
                 temp_item.save()
         elif 'all_delete' in request.POST['submit_btn']:
-            print('여기아냐?')
             now_datetime = datetime.today()
             set_time_today = set_search_day(now_datetime, now_datetime)
-            print(set_time_today)
             del_alldb = UploadDb.objects.filter(db_date__range=[set_time_today[0], set_time_today[1]])
             del_alldb.delete()
 
         elif 'delete' in request.POST['submit_btn']:
-            print('1111111111111')
             for val in list_num:
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
                 temp_item.delete()
@@ -452,14 +441,12 @@ def emp_dblist(request):
 
 @login_required
 def emp_dbstats(request):
-    print(request.user)
     # -------------- 뿌려주기 옵션값 끝!
     q = Q()
     j = Q()
 
     get_list = {}
     geton = get_getlist(request, q, j)
-    print(geton)
 
     q.add(Q(db_manager=request.user), q.AND)
     j.add(Q(db_manager=request.user), q.AND)
@@ -556,23 +543,11 @@ def divdb(request):
 
     error_text = ""
 
-    # test_tempi = {'testval': 'testval'}
-    # print(test_tempi['testval'])
-    #
-    # test_temp = DbUpdateChk.objects.get(id=1)
-    # test_temp2 = test_temp.duc_memo
-    # test_temp3 = eval(test_temp2)
-    # print(type(test_temp3))
-    # print(test_temp3['testval'])
-
     if request.method == 'POST':
 
         divdb_list = request.POST.getlist('divdb[]')
         divnick_list = request.POST.getlist('divnick[]')
         divid_list = request.POST.getlist('divid[]')
-
-
-        print()
 
         list_int = listStrToInt(divdb_list)
         sum_listint = sum(list_int)
@@ -585,7 +560,6 @@ def divdb(request):
             for list in list_int:
 
                 db_list = UploadDb.objects.filter(q)
-                print(db_list)
                 db_id_list = []
                 for onid in db_list:
                     db_id_list.append(onid.id)
@@ -622,7 +596,6 @@ def divdb(request):
 def markerlist(request):
     if request.method == 'POST':
         btnval = request.POST['gosubmit']
-        print(btnval)
         if btnval == 'create':
             newmarketer = MarketingList(mk_company=request.POST['mk_company'], mk_name=request.POST['mk_name'],
                                         mk_phone=request.POST['mk_phone'], mk_advtype=request.POST['mk_advtype'],
@@ -786,13 +759,6 @@ def newdbup(request):
                           {'marketing_list': marketing_list, 'sample_list': sample_list,
                            'error_message': error_message})
 
-    positive = float("inf")
-    print(positive)
-
-    chk_db_list = UploadDb.objects.all()
-
-    print(chk_db_list.get(db_phone='01085258525'))
-
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 
@@ -810,7 +776,6 @@ def accountmanagement(request):
         i = 0
         for val in id_count:
             temp_user = User.objects.get(id=id_list[int(val)])
-            print(temp_user)
             temp_user.rete = manager_rate[int(val)]
             temp_user.status = manager_status[int(val)]
             temp_user.nickname = manager_nick[int(val)]
@@ -835,7 +800,7 @@ def detail_customer(request, id):
 
         memo_list = DbMemo.objects.select_related('dm_chkdb').filter(dm_chkdb=customer_info).order_by('-id')
     except:
-        print('문제야 문제')
+        pass
     db_status = UploadDb.objects.get(id=id)
 
     if request.method == 'POST':
@@ -956,7 +921,6 @@ def workAjax(request):
         change_price = jsonObject.get('change_price')
         update_item = PaidList.objects.get(id=detail_id)
         update_item.pl_paidprice = change_price
-        print(update_item.pl_chkdb)
         update_item.save()
 
     elif 'add_username' in jsonObject:
@@ -975,7 +939,6 @@ def workAjax(request):
 
         receive_num = jsonObject.get('choices_num')
         receive_pwd = jsonObject.get('change_pw_input')
-        print(type(receive_num))
         user = User.objects.get(id=int(receive_num))
         user.set_password(receive_pwd)
         user.save()
@@ -985,7 +948,6 @@ def workAjax(request):
         memos = DbMemo.objects.get(id=receive_del_memo_id)
         memos.delete()
     else:
-        print('-------------------')
         # Http404()
         context = {'testpppp': 'testkjkasjdfkajsdkfj'}
         return JsonResponse(context)
@@ -1007,10 +969,6 @@ def test_chk(requese):
     # for list in test4:
     #     for inlist in list.mkdname.all():
     #         inlist.dbname.all()
-
-    # # test_chk = DbMemo.objects.select_related('dm_chkdb').filter(dm_chkdb=insi)
-    # for list in insi:
-    #     print(list.testfield.all())
 
     return render(requese, 'dbmanageapp/test_chk.html', )
 
