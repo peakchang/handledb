@@ -84,12 +84,15 @@ def base_setting(request):
         ds_status = request.POST.get('ds_status')
         ds_statusbase = request.POST.get('ds_statusbase')
         theme_status = request.POST.get('theme_status')
+        ds_overlapallow = request.POST.get('ds_overlapallow')
+
         set_model = DbSetting.objects.last()
 
         if set_model:
             set_model.company_name = company_name
             set_model.ds_status = ds_status
             set_model.ds_statusbase = ds_statusbase
+            set_model.ds_overlapallow = ds_overlapallow
             set_model.theme_status = theme_status
             if upload_img:
                 if set_model.logo_image:
@@ -102,6 +105,7 @@ def base_setting(request):
             dbset.company_name = company_name
             dbset.ds_status = ds_status
             dbset.ds_statusbase = ds_statusbase
+            dbset.ds_overlapallow = ds_overlapallow
             dbset.theme_status = theme_status
             if upload_img:
                 dbset.logo_image = upload_img
@@ -634,11 +638,14 @@ def newdbup(request):
 
     overlap_db = []
 
+
     if request.method == 'POST':
         now = datetime.now()
-        before_three_week = now - timedelta(weeks=3)
+        before_three_week = now - timedelta(weeks=10)
         set_tr_date = set_search_day(before_three_week, now)
         overlap_count = 0
+
+
 
         dblist_text = request.POST['dblist_text']
         if dblist_text and request.FILES.get('dblist_file') is None:
@@ -697,11 +704,12 @@ def newdbup(request):
 
                     dblist.append(row_value)
 
-
         try:
             base_seton = DbSetting.objects.last()
             base_set_list = base_seton.ds_status.split(',')
             base_status = base_set_list[0]
+            overlap_allow = base_seton.ds_overlapallow.split(',')
+
 
             # 업로드 DB 구분을 위한 이름을 만듦
             dbn_mkname = request.POST.get('dbn_mkname')
@@ -729,10 +737,20 @@ def newdbup(request):
                     set_arr_count = 6 - len(dbval)
                     for i in range(set_arr_count):
                         dbval.append('')
+                # try:
+                #     if chk_db_list.get(db_phone=dbval[0]):
+                #         overlap_count += 1
+                #         continue
+                # except:
+                #     pass
                 try:
-                    if chk_db_list.get(db_phone=dbval[0]):
-                        overlap_count += 1
-                        continue
+                    chk_db = chk_db_list.filter(db_phone=dbval[0]).last()
+                    if chk_db:
+                        if chk_db.db_status in overlap_allow:
+                            pass
+                        else:
+                            overlap_count += 1
+                            continue
                 except:
                     pass
 

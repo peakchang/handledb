@@ -21,7 +21,4 @@ urlpatterns = [
     path('test_chk/', views.test_chk, name='test_chk'),
     path('status_stats/', views.status_stats, name='status_stats'),
     path('updatedb/', views.update_db, name='updatedb')
-
-
-
 ]

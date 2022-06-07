@@ -9,6 +9,7 @@ THEME_CHOICE = (('light', '라이트'), ('dark', '다크'))
 class DbSetting(models.Model):
     ds_status = models.CharField(max_length=255, null=True, blank=True)
     ds_statusbase = models.CharField(max_length=20, null=True, blank=True, default='')
+    ds_overlapallow = models.CharField(max_length=255, null=True, blank=True, default='')
     logo_image = models.ImageField(upload_to='setimage/', null=True, blank=True)
     company_name = models.CharField(max_length=255, null=True)
     theme_status = models.CharField(choices=THEME_CHOICE, max_length=5, null=False, default='dark')
