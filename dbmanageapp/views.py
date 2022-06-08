@@ -747,6 +747,9 @@ def newdbup(request):
                     chk_db = chk_db_list.filter(db_phone=dbval[0]).last()
                     if chk_db:
                         if chk_db.db_status in overlap_allow:
+                            chk_db_on = chk_db_list.filter(db_phone=dbval[0])
+                            for del_db in chk_db_on:
+                                del_db.delete()
                             pass
                         else:
                             overlap_count += 1
