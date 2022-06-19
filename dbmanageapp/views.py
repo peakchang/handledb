@@ -143,7 +143,7 @@ def base_setting(request):
         ds_status = request.POST.get('ds_status')
         ds_statusbase = request.POST.get('ds_statusbase')
         theme_status = request.POST.get('theme_status')
-        ds_overlapallow = request.POST.get('ds_overlapallow')
+        # ds_overlapallow = request.POST.get('ds_overlapallow')
 
         set_model = DbSetting.objects.last()
 
@@ -151,7 +151,7 @@ def base_setting(request):
             set_model.company_name = company_name
             set_model.ds_status = ds_status
             set_model.ds_statusbase = ds_statusbase
-            set_model.ds_overlapallow = ds_overlapallow
+            # set_model.ds_overlapallow = ds_overlapallow
             set_model.theme_status = theme_status
             if upload_img:
                 if set_model.logo_image:
@@ -164,7 +164,7 @@ def base_setting(request):
             dbset.company_name = company_name
             dbset.ds_status = ds_status
             dbset.ds_statusbase = ds_statusbase
-            dbset.ds_overlapallow = ds_overlapallow
+            # dbset.ds_overlapallow = ds_overlapallow
             dbset.theme_status = theme_status
             if upload_img:
                 dbset.logo_image = upload_img
