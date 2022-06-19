@@ -1,9 +1,11 @@
 import os
+import time
 import urllib
 from urllib.parse import urlencode, parse_qsl, urlsplit
 from datetime import datetime, timedelta
 from itertools import chain
 
+import xlwt
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -27,6 +29,63 @@ from dbmanageapp.models import MarketingList, UploadDbName, UploadDb, DbSetting,
 from openpyxl import load_workbook
 
 from dateutil.relativedelta import *
+
+
+def make_excel(request):
+
+    sd = request.POST.get('ex_sd')
+    ed = request.POST.get('ex_ed')
+
+    datetime_format = "%Y-%m-%d"
+    onsd = datetime.strptime(sd,datetime_format)
+    oned = datetime.strptime(ed, datetime_format)
+    set_date = set_search_day(onsd, oned)
+
+
+    response = HttpResponse(content_type="application/vnd.ms-excel")
+    response["Content-Disposition"] = 'attachment;filename*=UTF-8\'\'example.xls'
+    wb = xlwt.Workbook(encoding='ansi')  # encoding은 ansi로 해준다.
+    ws = wb.add_sheet('sheet1')  # 시트 추가
+
+
+    all_memo = DbMemo.objects.filter(dm_date__range=[set_date[0], set_date[1]])
+
+
+
+    row_num = 0
+    col_names = ['공란','전화번호','이름','나이','성별','자산','담당자','담당자 닉네임','상태','결제금액','결제상태']
+
+    # 열이름을 첫번째 행에 추가 시켜준다.
+    for idx, col_name in enumerate(col_names):
+        ws.write(row_num, idx, col_name)
+
+    # 데이터 베이스에서 유저 정보를 불러온다.
+    all_db_list = UploadDb.objects.filter(db_date__range=[set_date[0], set_date[1]]).values_list('id','db_phone', 'db_member', 'db_age', 'db_sex', 'db_inv', 'db_manager', 'db_manager_nick', 'db_status', 'db_paidprice', 'db_paidstatus')
+
+    rows = []
+    for dblist in all_db_list:
+        chk_memo = all_memo.filter(dm_chkdb=dblist[0])
+        if(chk_memo):
+            dblist = list(dblist)
+            for chkcount, memo in enumerate(chk_memo):
+                if chkcount > 2:
+                    break
+                else:
+                    dblist.append(memo.dm_memos)
+            dblist = tuple(dblist)
+        rows.append(dblist)
+
+    # 유저정보를 한줄씩 작성한다.
+    for row in rows:
+        row_num += 1
+        for col_num, attr in enumerate(row):
+            if col_num == 0:
+                continue
+            ws.write(row_num, col_num, attr)
+
+
+    wb.save(response)
+    return response
 
 
 def update_db(request):

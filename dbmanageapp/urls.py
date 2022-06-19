@@ -20,5 +20,6 @@ urlpatterns = [
     path('marketer_stats/', views.marketer_stats, name='marketer_stats'),
     path('test_chk/', views.test_chk, name='test_chk'),
     path('status_stats/', views.status_stats, name='status_stats'),
-    path('updatedb/', views.update_db, name='updatedb')
+    path('updatedb/', views.update_db, name='updatedb'),
+    path('make_excel/', views.make_excel, name='make_excel')
 ]
