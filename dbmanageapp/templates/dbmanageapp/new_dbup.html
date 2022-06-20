@@ -2,4 +2,209 @@
 
 {% block dbmanage_content %}
 
-{% endblock %}
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container">
+
+            <form action="" method="post" enctype="multipart/form-data" id="db_addform">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12 col-md-6 mt-5">
+                        <table class="type07" style="height:100%;">
+                            <tr>
+                                <th style="height:60px;">신규 DB 등록</th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <textarea class="input_dbta" name="dblist_text"
+                                              style="min-height:200px; height:100%;"></textarea>
+                                </th>
+
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="col-12 col-md-6 mt-5">
+                        <div class="excelup_tt">
+                            엑셀파일 신규등록
+                            <a href="{{ sample_list.sample_excel_file.url }}" download="테스트">(샘플 엑셀 다운)</a>
+                        </div>
+                        <div class="excelup_ff">
+                            <div class="file is-info is-small has-name is-fullwidth excelfile">
+                                <label class="file-label">
+                                    <input class="file-input" type="file" name="dblist_file" accept=".xls,.xlsx">
+                                    <span class="file-cta">
+                                        <span class="file-icon"><i class="fas fa-upload"></i></span>
+                                        <span class="file-label">파일 올리기</span>
+                                    </span>
+                                    <span class="file-name">클릭해서 파일을 올려주세요</span>
+                                </label>
+                            </div>
+
+<!--                            <div class="file is-warning is-small has-name is-fullwidth buexcelfile pl-2">-->
+<!--                                <label class="file-label">-->
+<!--                                    <input class="file-input" type="file" name="backup_dblist_file" accept=".xls,.xlsx">-->
+<!--                                    <span class="file-cta">-->
+<!--                                        <span class="file-icon"><i class="fas fa-upload"></i></span>-->
+<!--                                        <span class="file-label">백업파일 올리기</span>-->
+<!--                                    </span>-->
+<!--                                    <span class="file-name">클릭해서 파일을 올려주세요</span>-->
+<!--                                </label>-->
+<!--                            </div>-->
+                        </div>
+
+<!--                        <div style="border:1px solid #ccc; border-bottom: none; padding: 10px; font-size:12px; text-align:right" >-->
+<!--                            백업 파일 업로드는 기존 DB 백업파일 업로드 시에만 사용해주세요 (1회 업로드시 5000개 이하)-->
+<!--                        </div>-->
+
+
+
+                        <div class="excelup_imginfo">
+                            <img src="{{ sample_list.sample_image.url }}" alt="">
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+                <div class="addinput_table mt-5">
+                    {% if error_message %}
+                    <div><span class="tag is-danger mb-2 excelerror">{{ error_message }}</span></div>
+                    {% endif %}
+                    <table class="type07">
+                        <tr>
+                            <th>마케터</th>
+                            <td>
+                                {% if marketing_list %}
+                                <div class="select is-small">
+                                    <select name="dbn_mkname">
+                                        {% for val in marketing_list %}
+                                        <option value="{{ val.mk_company }}">{{ val.mk_company }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                {% else %}
+                                <div>마케팅 리스트를 추가해주세요!</div>
+                                {% endif %}
+                            </td>
+                            <th>DB명</th>
+                            <td>
+                                <div class="d-flex">
+                                    <input type="text" class="input is-info is-small" name="dbn_name" required>
+                                    <span class="button is-warning is-small">삭제</span>
+                                </div>
+
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>구입비용</th>
+                            <td>
+                                <input type="text" class="input is-info is-small" name="dbn_price" id="dbn_price"
+                                       placeholder="0" required>
+                            </td>
+                            <th>메모</th>
+                            <td>
+                                <input type="text" class="input is-info is-small" name="dbn_memo">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                {% for message in messages %}
+                <span
+                        {% if message.tags %} class="{{ message.tags }} tag is-link" {% endif %}>{{ message }}</span>
+                {% endfor %}
+
+                <div class="text-center">
+
+                    <button type="submit" name="button" class="mt-3 button is-success w-50">업로드</button>
+                </div>
+            </form>
+
+        </div>
+    </main>
+
+    <script>
+
+    var excelerror = document.querySelector('.excelerror')
+    if(excelerror){
+        alert('업로드 실패! 오류메세지를 확인해주세요')
+   }
+
+$('#db_addform').submit(function(){
+    var dbn_price = document.querySelector('#dbn_price').value
+
+    var temp_dbnprice = removeCommas(Num(dbn_price))
+    dbn_price.value = temp_dbnprice
+
+    alert(dbn_price.value)
+    return false
+
+    var dbn_price = document.querySelector('#dbn_price')
+    alert(dbn_price.value)
+
+    var dbn_mkname = document.querySelector('select[name=dbn_mkname]')
+    if(!dbn_mkname){
+      alert('마케팅 리스트를 먼저 추가해주세요!')
+      return false
+    }
+  })
+
+$(document).click(function(){
+  var input_dbta = document.querySelector('.input_dbta').value
+    input_dbta = input_dbta.replace(/(\r\n|\n|\r)/gm, "\n");
+    console.log(input_dbta)
+})
+
+$("#dbn_price").on("keyup", function() {
+        console.log(this.value)
+        $(this).val($(this).val().replace(/[^0-9]/g,""));
+        this.value = addComma(this.value)
+   });
+
+
+  const fileInput = document.querySelector('.excelfile input[type=file]');
+  fileInput.onchange = () => {
+    if (fileInput.files.length > 0) {
+      const fileName = document.querySelector('.excelfile .file-name');
+      fileName.textContent = fileInput.files[0].name;
+      console.log(fileName.textContent)
+      var goinput_filename = fileName.textContent
+      var goinput_filename = goinput_filename.trim().replace(/(.xls|.xlsx)$/,'');
+      console.log(goinput_filename)
+      document.querySelector('input[name=dbn_name]').value = goinput_filename
+    }
+  }
+
+  const fileInputon = document.querySelector('.buexcelfile input[type=file]');
+  fileInputon.onchange = () => {
+    if (fileInputon.files.length > 0) {
+      console.log('alsidjfalsfd')
+      const fileName = document.querySelector('.buexcelfile .file-name');
+      fileName.textContent = fileInputon.files[0].name;
+      console.log(fileName.textContent)
+      var goinput_filename = fileName.textContent
+      var goinput_filename = goinput_filename.trim().replace(/(.xls|.xlsx)$/,'');
+      console.log(goinput_filename)
+      document.querySelector('input[name=dbn_name]').value = goinput_filename
+    }
+  }
+
+function addComma(data) {
+    return data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function removeCommas(data) {
+    if(!data || data.length == 0){
+    	return "";
+    }else{
+    	return x.split(",").join("");
+    }
+}
+
+
+    </script>
+    {% endblock %}
