@@ -978,7 +978,7 @@ def new_dbup(request):
 
                     if not chk_list:
                         break
-                        
+
                     if len(row_value) < 2:
                         temp_rowval = row_value[0]
                         row_value.append(temp_rowval)
