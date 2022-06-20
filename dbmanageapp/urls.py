@@ -8,6 +8,7 @@ urlpatterns = [
     path('accountmanagement/', views.accountmanagement, name='accountmanagement'),
     path('markterlist/', views.markerlist, name='markerlist'),
     path('newdbup/', views.newdbup, name='newdbup'),
+    path('new_dbup/', views.new_dbup, name='new_dbup'),
     path('divdb/', views.divdb, name='divdb'),
     path('alldblist/', views.alldblist, name='alldblist'),
     path('sale_st/', views.sale_st, name='sale_st'),
