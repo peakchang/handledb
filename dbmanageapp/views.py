@@ -53,34 +53,52 @@ def make_excel(request):
 
 
     row_num = 0
-    col_names = ['공란','전화번호','이름','나이','성별','자산','담당자','담당자 닉네임','상태','결제금액','결제상태']
+    col_names = ['마케터','전화번호','이름','나이','성별','자산','담당자','담당자 닉네임','상태','결제금액','결제상태']
 
     # 열이름을 첫번째 행에 추가 시켜준다.
     for idx, col_name in enumerate(col_names):
         ws.write(row_num, idx, col_name)
 
     # 데이터 베이스에서 유저 정보를 불러온다.
-    all_db_list = UploadDb.objects.filter(db_date__range=[set_date[0], set_date[1]]).values_list('id','db_phone', 'db_member', 'db_age', 'db_sex', 'db_inv', 'db_manager', 'db_manager_nick', 'db_status', 'db_paidprice', 'db_paidstatus')
+    all_db_list = UploadDb.objects.select_related('db_mkname').filter(db_date__range=[set_date[0], set_date[1]])
 
     rows = []
     for dblist in all_db_list:
-        chk_memo = all_memo.filter(dm_chkdb=dblist[0])
-        if(chk_memo):
-            dblist = list(dblist)
+        chk_memo = all_memo.filter(dm_chkdb=dblist)
+        chk_marketer = dblist.db_mkname.mk_company
+        print(dblist.db_mkname.mk_company)
+        print(dblist.db_phone)
+        set_list = [chk_marketer, dblist.db_phone, dblist.db_member, dblist.db_age, dblist.db_sex, dblist.db_inv, dblist.db_manager, dblist.db_manager_nick, dblist.db_status, dblist.db_paidprice, dblist.db_paidstatus]
+        if (chk_memo):
             for chkcount, memo in enumerate(chk_memo):
                 if chkcount > 2:
                     break
                 else:
-                    dblist.append(memo.dm_memos)
-            dblist = tuple(dblist)
-        rows.append(dblist)
+                    set_list.append(memo.dm_memos)
 
+        rows.append(set_list)
+
+
+
+    # for dblist in all_db_list:
+    #     chk_memo = all_memo.filter(dm_chkdb=dblist[0])
+    #
+    #     print(dblist.db_mkname)
+    #     # chk_maketer =
+    #     if(chk_memo):
+    #         dblist = list(dblist)
+    #         for chkcount, memo in enumerate(chk_memo):
+    #             if chkcount > 2:
+    #                 break
+    #             else:
+    #                 dblist.append(memo.dm_memos)
+    #         dblist = tuple(dblist)
+    #     rows.append(dblist)
+    #
     # 유저정보를 한줄씩 작성한다.
     for row in rows:
         row_num += 1
         for col_num, attr in enumerate(row):
-            if col_num == 0:
-                continue
             ws.write(row_num, col_num, attr)
 
 
