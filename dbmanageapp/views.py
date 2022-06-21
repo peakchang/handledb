@@ -1057,7 +1057,7 @@ def new_dbup(request):
                           {'marketing_list': marketing_list, 'sample_list': sample_list,
                            'error_message': error_message})
 
-    return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list})
+    return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 # **********************************
 
