@@ -217,6 +217,22 @@
                                 {% endfor %}
                             </select>
                         </div>
+
+                        <div class="center_text">
+                            <span>상태값 변경 :</span>
+                        </div>
+                        <div class="select is-small mr-3">
+                            <select name="change_all_status" class="change_all_status">
+                                <option value="">선택</option>
+                                {% for stlist in status_list %}
+                                <option value="{{ stlist }}" {% if stlist == get_list.ns %} selected="selected"{% endif %}>
+                                    {{ stlist }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
                         <input type="hidden" name="change_manager_nick" class="change_manager_nick">
                         {% endif %}
                         <div>

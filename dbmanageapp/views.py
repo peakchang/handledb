@@ -332,7 +332,10 @@ def alldblist(request):
         change_status = request.POST.getlist('change_status[]')
         change_manager = request.POST['change_manager']
         change_manager_nick = request.POST['change_manager_nick']
+        change_all_status = request.POST.get('change_all_status')
 
+        print(change_manager)
+        print(change_all_status)
         if 'update' in request.POST['submit_btn']:
             for val in list_num:
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
@@ -340,6 +343,8 @@ def alldblist(request):
                 if change_manager:
                     temp_item.db_manager = change_manager
                     temp_item.db_manager_nick = change_manager_nick
+                if change_all_status:
+                    temp_item.db_status = change_all_status
                 temp_item.save()
         elif 'all_delete' in request.POST['submit_btn']:
             now_datetime = datetime.today()
