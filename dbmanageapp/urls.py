@@ -16,6 +16,7 @@ urlpatterns = [
     path('workajax/', views.workAjax, name='workajax'),
 
     path('emp_dblist/', views.emp_dblist, name='emp_dblist'),
+    path('div_dbname/', views.div_dbname, name='div_dbname'),
     path('emp_dbstats/', views.emp_dbstats, name='emp_dbstats'),
     path('base_setting/', views.base_setting, name='base_setting'),
     path('marketer_stats/', views.marketer_stats, name='marketer_stats'),

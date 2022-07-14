@@ -31,29 +31,72 @@ from openpyxl import load_workbook
 from dateutil.relativedelta import *
 
 
-def make_excel(request):
+def div_dbname(request):
 
+
+
+
+    context = {}
+
+    # 마케팅 리스트 에러 처리 (초기값 셋팅 X)
+    try:
+        marketing_list = MarketingList.objects.all()
+        context['marketing_list'] = marketing_list
+    except:
+        error = '마케팅 리스트를 추가해주세요!'
+        return render(request, 'dbmanageapp/alldblist.html', {'error': error})
+
+
+    try:
+        on_sd_oo = request.GET['sd']
+        on_ed_oo = request.GET['ed']
+        datetime_format = "%Y-%m-%d"
+        on_sd = datetime.strptime(on_sd_oo, datetime_format)
+        on_ed = datetime.strptime(on_ed_oo, datetime_format)
+        div_date = set_search_day(on_sd, on_ed)
+        context['sd'] = on_sd_oo
+        context['ed'] = on_ed_oo
+    except:
+        now_datetime = datetime.today()
+        f_datetime = datetime(now_datetime.year, now_datetime.month, 1)
+        div_date = set_search_day(f_datetime, now_datetime)
+
+    if request.method == 'POST':
+        mk = request.POST.get('mk')
+        context['mk'] = mk
+        dbname_num = request.POST.getlist('dbname_num[]')
+        dbname_id = request.POST.getlist('dbname_id[]')
+        get_mk = MarketingList.objects.get(mk_company=mk)
+
+        for val in dbname_num:
+            temp_dbname = UploadDbName.objects.get(id=dbname_id[int(val)])
+            temp_dbname.dbn_mkname = get_mk
+            temp_dbname.save()
+
+    db_name_list = UploadDbName.objects.filter(dbn_date__range=[div_date[0], div_date[1]])
+    context['db_name_list'] = db_name_list
+
+    return render(request, 'dbmanageapp/div_dbname.html', context)
+
+
+def make_excel(request):
     sd = request.POST.get('ex_sd')
     ed = request.POST.get('ex_ed')
 
     datetime_format = "%Y-%m-%d"
-    onsd = datetime.strptime(sd,datetime_format)
+    onsd = datetime.strptime(sd, datetime_format)
     oned = datetime.strptime(ed, datetime_format)
     set_date = set_search_day(onsd, oned)
-
 
     response = HttpResponse(content_type="application/vnd.ms-excel")
     response["Content-Disposition"] = 'attachment;filename*=UTF-8\'\'example.xls'
     wb = xlwt.Workbook(encoding='ansi')  # encoding은 ansi로 해준다.
     ws = wb.add_sheet('sheet1')  # 시트 추가
 
-
     all_memo = DbMemo.objects.filter(dm_date__range=[set_date[0], set_date[1]])
 
-
-
     row_num = 0
-    col_names = ['마케터','전화번호','이름','나이','성별','자산','담당자','담당자 닉네임','상태','결제금액','결제상태']
+    col_names = ['마케터', '전화번호', '이름', '나이', '성별', '자산', '담당자', '담당자 닉네임', '상태', '결제금액', '결제상태']
 
     # 열이름을 첫번째 행에 추가 시켜준다.
     for idx, col_name in enumerate(col_names):
@@ -68,7 +111,9 @@ def make_excel(request):
         chk_marketer = dblist.db_mkname.mk_company
         print(dblist.db_mkname.mk_company)
         print(dblist.db_phone)
-        set_list = [chk_marketer, dblist.db_phone, dblist.db_member, dblist.db_age, dblist.db_sex, dblist.db_inv, dblist.db_manager, dblist.db_manager_nick, dblist.db_status, dblist.db_paidprice, dblist.db_paidstatus]
+        set_list = [chk_marketer, dblist.db_phone, dblist.db_member, dblist.db_age, dblist.db_sex, dblist.db_inv,
+                    dblist.db_manager, dblist.db_manager_nick, dblist.db_status, dblist.db_paidprice,
+                    dblist.db_paidstatus]
         if (chk_memo):
             for chkcount, memo in enumerate(chk_memo):
                 if chkcount > 2:
@@ -77,8 +122,6 @@ def make_excel(request):
                     set_list.append(memo.dm_memos)
 
         rows.append(set_list)
-
-
 
     # for dblist in all_db_list:
     #     chk_memo = all_memo.filter(dm_chkdb=dblist[0])
@@ -101,7 +144,6 @@ def make_excel(request):
         for col_num, attr in enumerate(row):
             ws.write(row_num, col_num, attr)
 
-
     wb.save(response)
     return response
 
@@ -113,6 +155,7 @@ def update_db(request):
             dlist.dm_manager = dlist.dm_chkdb.db_manager
             dlist.save()
     return HttpResponse('완료가 잘 되었는지 봅시다.')
+
 
 @login_required
 def dbmainpage(request):
@@ -141,7 +184,7 @@ def dbmainpage(request):
     l_sales = last_month_price.aggregate(Sum('db_paidprice'))
     n_sales = n_sales['db_paidprice__sum']
     l_sales = l_sales['db_paidprice__sum']
-    i=0
+    i = 0
 
     if not n_sales or not l_sales:
         growth_per = None
@@ -150,7 +193,6 @@ def dbmainpage(request):
 
     return render(request, 'dbmanageapp/mainpage.html',
                   {'n_sales': n_sales, 'l_sales': l_sales, 'growth_per': growth_per})
-
 
 
 @login_required
@@ -296,14 +338,12 @@ def alldblist(request):
     q = Q()
     j = Q()
 
-
     get_list = {}
     geton = get_getlist(request, q, j)
     status_count = []
 
-    #변경 부분1
+    # 변경 부분1
     q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
-
 
     all_get = UploadDb.objects.select_related('db_mkname').filter(q)
     all_count = all_get.count()
@@ -312,14 +352,13 @@ def alldblist(request):
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
         status_count.append(status_get.count())
 
-
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
 
     rangenum = list(reversed(range(1, db_list.count() + 1)))
 
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
-    #변경부분2
+    # 변경부분2
     db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-db_date')[pagenum[0]:pagenum[1]]
     pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
 
@@ -357,7 +396,6 @@ def alldblist(request):
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
                 temp_item.delete()
 
-
         qstring = request.POST.get('qstring')
         response = redirect(reverse('dbmanage:alldblist'))
         response['Location'] += "?"
@@ -368,6 +406,7 @@ def alldblist(request):
                    'status_list': status_list, 'status_count': status_count,
                    'marketing_list': marketing_list, 'pageval': pagenum[4],
                    'get_page_num': geton['get_page_num'], 'get_list': geton, 'all_count': all_count}, )
+
 
 @login_required
 def status_stats(request):
@@ -433,7 +472,6 @@ def status_stats(request):
     sum_list = sum_list + sum_list_arr
     make_sum = sum_list[1]
 
-
     j = -1
     for perchk in sum_list_arr:
         j = j + 1
@@ -446,9 +484,11 @@ def status_stats(request):
             per_list_arr[j] = per_on
     per_list = ['']
     per_list = per_list + per_list_arr
-    appon_list = zip(per_list,sum_list)
+    appon_list = zip(per_list, sum_list)
 
-    return render(request, 'dbmanageapp/status_stats.html', {'all_list_arr': all_list_arr, 'status_list': all_status_list,'appon_list':appon_list})
+    return render(request, 'dbmanageapp/status_stats.html',
+                  {'all_list_arr': all_list_arr, 'status_list': all_status_list, 'appon_list': appon_list})
+
 
 @login_required
 def emp_dblist(request):
@@ -481,8 +521,6 @@ def emp_dblist(request):
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
         status_count.append(status_get.count())
-
-
 
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
@@ -517,12 +555,11 @@ def emp_dblist(request):
         response['Location'] += qstring
         return response
 
-
     return render(request, 'dbmanageapp/emp_dblist.html',
                   {'db_list_val': alldb_zip, 'status_count': status_count, 'status_count': status_count,
                    'status_list': status_list,
-                   'pageval': pagenum[4], 'get_page_num': geton['get_page_num'], 'get_list': geton, 'all_count': all_count}, )
-
+                   'pageval': pagenum[4], 'get_page_num': geton['get_page_num'], 'get_list': geton,
+                   'all_count': all_count}, )
 
 
 @login_required
@@ -625,7 +662,7 @@ def divdb(request):
     # 날짜 GET 값 받기 에러 처리
     db_list = UploadDb.objects.filter(q)
 
-    userlist = User.objects.filter(rete='D',status='Y')
+    userlist = User.objects.filter(rete='D', status='Y')
 
     error_text = ""
 
@@ -659,11 +696,6 @@ def divdb(request):
                     div_dv_update.save()
                 k += 1
 
-
-
-
-
-
             messages.success(request, "분배가 완료되었습니다.")
             return HttpResponseRedirect(reverse('dbmanage:divdb'))
         except:
@@ -674,7 +706,8 @@ def divdb(request):
             elif sum(list_int) > db_list.count():
                 error_text = '분배할 값이 DB 수량보다 많습니다.'
     return render(request, 'dbmanageapp/divdb.html',
-                  {'db_list': db_list, 'userlist': userlist,'all_db_count':all_db_count, 'db_count_arr': db_count_arr, 'get_list': geton,
+                  {'db_list': db_list, 'userlist': userlist, 'all_db_count': all_db_count, 'db_count_arr': db_count_arr,
+                   'get_list': geton,
                    'marketing_list': marketing_list, 'error_text': error_text})
 
 
@@ -720,7 +753,6 @@ def newdbup(request):
 
     overlap_db = []
 
-
     if request.method == 'POST':
         now = datetime.now()
         before_three_week = now - timedelta(weeks=10)
@@ -730,7 +762,6 @@ def newdbup(request):
         dblist_text = request.POST['dblist_text']
         new_db_file = request.FILES.get('dblist_file')
         back_db_file = request.FILES.get('backup_dblist_file')
-
 
         if dblist_text or new_db_file:
             if dblist_text and new_db_file is None:
@@ -924,12 +955,6 @@ def newdbup(request):
         #         except:
         #             pass
 
-
-
-
-
-
-
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
 
@@ -945,7 +970,6 @@ def new_dbup(request):
         sample_list = ""
 
     overlap_db = []
-
 
     if request.method == 'POST':
         now = datetime.now()
@@ -1082,6 +1106,7 @@ def new_dbup(request):
 
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
+
 # **********************************
 
 
@@ -1125,7 +1150,6 @@ def detail_customer(request, id):
 
     if request.method == 'POST':
         if request.POST['sbm_button'] == 'update':
-
 
             status_sel = request.POST.get('status_sel')
             payment_sel = request.POST.get('paystatus_sel')
