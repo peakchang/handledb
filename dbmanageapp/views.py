@@ -32,10 +32,6 @@ from dateutil.relativedelta import *
 
 
 def div_dbname(request):
-
-
-
-
     context = {}
 
     # 마케팅 리스트 에러 처리 (초기값 셋팅 X)
@@ -122,22 +118,6 @@ def make_excel(request):
                     set_list.append(memo.dm_memos)
 
         rows.append(set_list)
-
-    # for dblist in all_db_list:
-    #     chk_memo = all_memo.filter(dm_chkdb=dblist[0])
-    #
-    #     print(dblist.db_mkname)
-    #     # chk_maketer =
-    #     if(chk_memo):
-    #         dblist = list(dblist)
-    #         for chkcount, memo in enumerate(chk_memo):
-    #             if chkcount > 2:
-    #                 break
-    #             else:
-    #                 dblist.append(memo.dm_memos)
-    #         dblist = tuple(dblist)
-    #     rows.append(dblist)
-    #
     # 유저정보를 한줄씩 작성한다.
     for row in rows:
         row_num += 1
