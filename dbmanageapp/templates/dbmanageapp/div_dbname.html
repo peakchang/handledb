@@ -1,0 +1,132 @@
+{% extends 'db_base.html' %}
+
+{% block dbmanage_content %}
+
+<div id="layoutSidenav_content">
+  <main>
+
+
+    <div class="container">
+      <!-- 검색 -->
+      <form action="" method="get">
+        <div class="pt-4">
+          <div class="inputlist">
+            <div class="inputflex">
+              <div class="center_text">
+                <input type="date" name="sd" value="{{ sd }}" class="currentDate_sd">
+              </div>
+              <div class="center_text">
+                <span>~</span>
+              </div>
+
+              <div class="center_text">
+                <input type="date" name="ed" value="{{ ed }}" class="currentDate_ed">
+              </div>
+            </div>
+
+            <div class="inputflex">
+              <div class="">
+                <button class="button is-small is-link">검색</button>
+              </div>
+            </div>
+          </div>
+
+
+
+        </div>
+      </form>
+      <!-- 검색끝 -->
+
+      <form class="" method="post">
+        {% csrf_token %}
+
+        <span style="display:inline-block; padding-top:4px;">마케팅리스트 : &nbsp;</span>
+        <div class="select is-info is-small">
+          <select name="mk" class="mk">
+              <option value="">전체선택</option>
+              {% for mlist in marketing_list %}
+              <option value="{{ mlist.mk_company }}"
+                      {% if mlist.mk_company == mk %}
+                      selected="selected"
+                      {% endif %}>{{ mlist.mk_company }}
+              </option>
+              {% endfor %}
+          </select>
+        </div>
+        <button class="button is-small is-success submit_btn">변경하기</button>
+        <!--        분배 전 DB 리스트-->
+        <div class="col-12 mt-5">
+          <table class="type07">
+            <tr>
+              <th>
+                <input type="checkbox" name="" value="" class="allchk">
+              </th>
+              <th>DB명</th>
+              <th>등록일</th>
+              <th>마케터</th>
+            </tr>
+
+
+            {% for dbname in db_name_list %}
+            <tr>
+              <td>
+                <input type="checkbox" name="dbname_num[]" class="dbname_num" value="{{ forloop.counter0 }}">
+                <input type="hidden" name="dbname_id[]" value="{{ dbname.id }}">
+              </td>
+              <td>{{ dbname.dbn_name }}</td>
+              <td>{{ dbname.dbn_date }}</td>
+              <td>{{ dbname.dbn_mkname.mk_company }}</td>
+            </tr>
+            {% endfor %}
+
+          </table>
+        </div>
+      </form>
+
+    </div>
+
+
+
+  </main>
+
+  <script type="text/javascript">
+    $('.submit_btn').click(function(){
+      var mk = document.querySelector('.mk').value
+      if(!mk){
+        alert('변경하실 마케터를 선택해주세요!')
+        return false
+      }
+    })
+
+    $('.allchk').change(function(){
+      console.log();
+      if(this.checked == true){
+        $('.dbname_num').attr('checked', true)
+      }else{
+        $('.dbname_num').attr('checked', false)
+      }
+    })
+  </script>
+
+  {% if not sd %}
+  <script !src="">
+    var t_date = new Date()
+    var t_date = new Date(t_date.getFullYear(), t_date.getMonth(), 1);
+    t_date.setHours(t_date.getHours()+9)
+    var dateval = t_date.toISOString().substring(0, 10)
+    $('.currentDate_sd').val(dateval)
+
+  </script>
+  {% endif %}
+
+  {% if not ed %}
+  <script !src="">
+    var t_date = new Date()
+    t_date.setHours(t_date.getHours()+9)
+    var dateval = t_date.toISOString().substring(0, 10)
+    $('.currentDate_ed').val(dateval)
+  </script>
+  {% endif %}
+
+
+  {% endblock %}
