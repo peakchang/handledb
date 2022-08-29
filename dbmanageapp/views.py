@@ -1088,7 +1088,19 @@ def newdbup(request):
 
 
 def new_dbup(request):
-    return render(request, 'dbmanageapp/newdbup.html', )
+    try:
+        marketing_list = MarketingList.objects.all()
+    except:
+        marketing_list = '마케팅 리스트를 추가해주세요!'
+
+    try:
+        sample_list = AllManage.objects.last()
+    except:
+        sample_list = ""
+
+    overlap_db = []
+
+    return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, })
 # **********************************
 
 
