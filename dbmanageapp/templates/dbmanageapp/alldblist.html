@@ -179,6 +179,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="ex_sd" value="{{ get_list.sd }}" class="ex_set_date">
                 <input type="hidden" name="ex_ed" value="{{ get_list.ed }}" class="ex_set_date">
+                <input type="hidden" name="ex_ns" value="{{ get_list.ns }}">
                 <button type="submit" class="button is-small is-info exdown">DB리스트 엑셀 다운</button>
                 <span style="font-size:12px;">&nbsp; 기간 설정 후 해당 기간 내 자료 다운 가능</span>
     		</form>

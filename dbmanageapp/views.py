@@ -78,6 +78,9 @@ def div_dbname(request):
 def make_excel(request):
     sd = request.POST.get('ex_sd')
     ed = request.POST.get('ex_ed')
+    ns = request.POST.get('ex_ns')
+    print(ns)
+
 
     datetime_format = "%Y-%m-%d"
     onsd = datetime.strptime(sd, datetime_format)
@@ -99,13 +102,24 @@ def make_excel(request):
         ws.write(row_num, idx, col_name)
 
     # 데이터 베이스에서 유저 정보를 불러온다.
-    all_db_list = UploadDb.objects.select_related('db_mkname').filter(db_date__range=[set_date[0], set_date[1]])
+
+    print(set_date[0])
+    print(set_date[1])
+    print(ns)
+    all_db_list = UploadDb.objects.select_related('db_mkname').filter(db_date__range=[set_date[0], set_date[1]], db_status=ns)
+    print(all_db_list)
 
     rows = []
     for dblist in all_db_list:
         chk_memo = all_memo.filter(dm_chkdb=dblist)
-        chk_marketer = dblist.db_mkname.mk_company
-        print(dblist.db_mkname.mk_company)
+        print(dblist)
+
+        try:
+            chk_marketer = dblist.db_mkname.mk_company
+        except:
+            chk_marketer = ""
+        print(chk_marketer)
+
         print(dblist.db_phone)
         set_list = [chk_marketer, dblist.db_phone, dblist.db_member, dblist.db_age, dblist.db_sex, dblist.db_inv,
                     dblist.db_manager, dblist.db_manager_nick, dblist.db_status, dblist.db_paidprice,
