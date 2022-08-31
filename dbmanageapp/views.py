@@ -748,6 +748,8 @@ def newdbup(request):
     overlap_db = []
 
     if request.method == 'POST':
+
+        print("asldijfalisjdfliajsdlfjaslidfjalisdjfasfd")
         now = datetime.now()
         before_three_week = now - timedelta(weeks=10)
         set_tr_date = set_search_day(before_three_week, now)
@@ -757,6 +759,9 @@ def newdbup(request):
         new_db_file = request.FILES.get('dblist_file')
         back_db_file = request.FILES.get('backup_dblist_file')
 
+        print(dblist_text)
+        print(new_db_file)
+        print(back_db_file)
         if dblist_text or new_db_file:
             if dblist_text and new_db_file is None:
                 dblist_text = dblist_text.splitlines(False)
@@ -887,67 +892,66 @@ def newdbup(request):
                 return render(request, 'dbmanageapp/newdbup.html',
                               {'marketing_list': marketing_list, 'sample_list': sample_list,
                                'error_message': error_message})
-        # elif back_db_file:
-        #     print('gogogogogogogogo')
-        #     try:
-        #         load_wb = load_workbook(back_db_file, data_only=True)
-        #     except:
-        #         error_message = "엑셀파일에 문제가 있습니다. 새로운 엑셀파일에 데이터를 넣고 업로드 해주세요"
-        #         return render(request, 'dbmanageapp/newdbup.html',
-        #                       {'marketing_list': marketing_list, 'sample_list': sample_list,
-        #                        'error_message': error_message})
-        #     load_ws = load_wb['Sheet1']
-        #     dblist = []
-        #     for row in load_ws.rows:
-        #         row_value = []
-        #
-        #         for cell in row:
-        #             cellval = cell.value
-        #             cellval = str(cellval)
-        #             cellval = re.sub("\!|\'|\?|\-", "", cellval)
-        #
-        #             if cellval.isdigit():
-        #                 cellval = cellval.zfill(11)
-        #             if cellval == 'None' or not cellval:
-        #                 cellval = ""
-        #             row_value.append(cellval)
-        #
-        #         chk_list = [v for v in row_value if v]
-        #
-        #         if not chk_list:
-        #             break
-        #         dblist.append(row_value)
-        #
-        #     chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]])
-        #     overlap_count = 0
-        #     for dbval in dblist:
-        #         chk_db = chk_db_list.filter(db_phone=dbval[0]).last()
-        #         if chk_db:
-        #             pass
-        #
-        #         db_up = UploadDb(db_phone=dbval[0], db_member=dbval[1], db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_manager=dbval[5], db_manager_nick=dbval[6], db_status=dbval[7], db_paidprice=dbval[8], db_paidstatus=dbval[9])
-        #         db_up.save()
-        #
-        #         if dbval[10] != "":
-        #             serch_menodb = UploadDb.objects.last()
-        #             memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[10])
-        #             memoup.save()
-        #
-        #         try:
-        #             if dbval[11] != "":
-        #                 serch_menodb = UploadDb.objects.last()
-        #                 memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[11])
-        #                 memoup.save()
-        #         except:
-        #             pass
-        #
-        #         try:
-        #             if dbval[12] != "":
-        #                 serch_menodb = UploadDb.objects.last()
-        #                 memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[12])
-        #                 memoup.save()
-        #         except:
-        #             pass
+        elif back_db_file:
+            try:
+                load_wb = load_workbook(back_db_file, data_only=True)
+            except:
+                error_message = "엑셀파일에 문제가 있습니다. 새로운 엑셀파일에 데이터를 넣고 업로드 해주세요"
+                return render(request, 'dbmanageapp/newdbup.html',
+                              {'marketing_list': marketing_list, 'sample_list': sample_list,
+                               'error_message': error_message})
+            load_ws = load_wb['Sheet1']
+            dblist = []
+            for row in load_ws.rows:
+                row_value = []
+
+                for cell in row:
+                    cellval = cell.value
+                    cellval = str(cellval)
+                    cellval = re.sub("\!|\'|\?|\-", "", cellval)
+
+                    if cellval.isdigit():
+                        cellval = cellval.zfill(11)
+                    if cellval == 'None' or not cellval:
+                        cellval = ""
+                    row_value.append(cellval)
+
+                chk_list = [v for v in row_value if v]
+
+                if not chk_list:
+                    break
+                dblist.append(row_value)
+
+            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]])
+            overlap_count = 0
+            for dbval in dblist:
+                chk_db = chk_db_list.filter(db_phone=dbval[0]).last()
+                if chk_db:
+                    pass
+
+                db_up = UploadDb(db_phone=dbval[1], db_member=dbval[2], db_age=dbval[3], db_sex=dbval[4], db_inv=dbval[5], db_manager=dbval[6], db_manager_nick=dbval[7], db_status=dbval[8], db_paidprice=dbval[9], db_paidstatus=dbval[10])
+                db_up.save()
+
+                if dbval[11] != "":
+                    serch_menodb = UploadDb.objects.last()
+                    memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[11])
+                    memoup.save()
+
+                try:
+                    if dbval[12] != "":
+                        serch_menodb = UploadDb.objects.last()
+                        memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[12])
+                        memoup.save()
+                except:
+                    pass
+
+                try:
+                    if dbval[13] != "":
+                        serch_menodb = UploadDb.objects.last()
+                        memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[13])
+                        memoup.save()
+                except:
+                    pass
 
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
 
