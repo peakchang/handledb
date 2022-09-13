@@ -515,6 +515,8 @@ def divdb(request):
     except:
         error = '마케팅 리스트를 추가해주세요!'
         return render(request, 'dbmanageapp/alldblist.html', {'error': error})
+
+    # set_date = set_search_day(now_datetime, now_datetime)
     q = Q()
     # 미분배 DB 목록 수량 구하기
     db_count_arr = []
@@ -540,9 +542,12 @@ def divdb(request):
     q.add(Q(db_manager__isnull=True), j.AND)
 
     geton = get_getlist(request, q, j)
+
+    q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
+    j.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
     # 날짜 GET 값 받기 에러 처리
     db_list = UploadDb.objects.filter(q)
-
+    
     userlist = User.objects.filter(rete='D',status='Y')
 
     error_text = ""
