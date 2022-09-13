@@ -44,7 +44,7 @@ a{text-decoration:none;}
 
   .excelup_tt{background-color: #ececec; text-align: center; font-size: 14px; font-weight: bold; padding: 10px; border: 1px solid #ccc; border-bottom: none;}
   .excelup_bb{display: flex; justify-content: center; font-size: 14px; font-weight: bold; background-color: #ececec; padding: 10px; border: 1px solid #ccc; border-bottom: none;}
-  .excelup_ff{display: flex; justify-content: space-between; padding: 10px; border: 1px solid #ccc; border-bottom: none;}
+  .excelup_ff{display: flex; flex-wrap:wrap; justify-content: center; padding: 10px; border: 1px solid #ccc; border-bottom: none;}
   .excelup_imginfo{border: 1px solid #ccc; padding: 10px 0; text-align: center;}
 
   @media screen and (max-width: 768px) {

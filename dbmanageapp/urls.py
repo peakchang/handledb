@@ -8,6 +8,7 @@ urlpatterns = [
     path('accountmanagement/', views.accountmanagement, name='accountmanagement'),
     path('markterlist/', views.markerlist, name='markerlist'),
     path('newdbup/', views.newdbup, name='newdbup'),
+    path('new_dbup/', views.new_dbup, name='new_dbup'),
     path('divdb/', views.divdb, name='divdb'),
     path('alldblist/', views.alldblist, name='alldblist'),
     path('sale_st/', views.sale_st, name='sale_st'),
@@ -15,10 +16,13 @@ urlpatterns = [
     path('workajax/', views.workAjax, name='workajax'),
 
     path('emp_dblist/', views.emp_dblist, name='emp_dblist'),
+    path('div_dbname/', views.div_dbname, name='div_dbname'),
     path('emp_dbstats/', views.emp_dbstats, name='emp_dbstats'),
     path('base_setting/', views.base_setting, name='base_setting'),
     path('marketer_stats/', views.marketer_stats, name='marketer_stats'),
     path('test_chk/', views.test_chk, name='test_chk'),
     path('status_stats/', views.status_stats, name='status_stats'),
-    path('updatedb/', views.update_db, name='updatedb')
+    path('updatedb/', views.update_db, name='updatedb'),
+    path('make_excel/', views.make_excel, name='make_excel'),
+
 ]

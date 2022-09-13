@@ -1,9 +1,11 @@
 import os
+import time
 import urllib
 from urllib.parse import urlencode, parse_qsl, urlsplit
 from datetime import datetime, timedelta
 from itertools import chain
 
+import xlwt
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -29,6 +31,117 @@ from openpyxl import load_workbook
 from dateutil.relativedelta import *
 
 
+def div_dbname(request):
+    context = {}
+
+    # 마케팅 리스트 에러 처리 (초기값 셋팅 X)
+    try:
+        marketing_list = MarketingList.objects.all()
+        context['marketing_list'] = marketing_list
+    except:
+        error = '마케팅 리스트를 추가해주세요!'
+        return render(request, 'dbmanageapp/alldblist.html', {'error': error})
+
+
+    try:
+        on_sd_oo = request.GET['sd']
+        on_ed_oo = request.GET['ed']
+        datetime_format = "%Y-%m-%d"
+        on_sd = datetime.strptime(on_sd_oo, datetime_format)
+        on_ed = datetime.strptime(on_ed_oo, datetime_format)
+        div_date = set_search_day(on_sd, on_ed)
+        context['sd'] = on_sd_oo
+        context['ed'] = on_ed_oo
+    except:
+        now_datetime = datetime.today()
+        f_datetime = datetime(now_datetime.year, now_datetime.month, 1)
+        div_date = set_search_day(f_datetime, now_datetime)
+
+    if request.method == 'POST':
+        mk = request.POST.get('mk')
+        context['mk'] = mk
+        dbname_num = request.POST.getlist('dbname_num[]')
+        dbname_id = request.POST.getlist('dbname_id[]')
+        get_mk = MarketingList.objects.get(mk_company=mk)
+
+        for val in dbname_num:
+            temp_dbname = UploadDbName.objects.get(id=dbname_id[int(val)])
+            temp_dbname.dbn_mkname = get_mk
+            temp_dbname.save()
+
+    db_name_list = UploadDbName.objects.filter(dbn_date__range=[div_date[0], div_date[1]])
+    context['db_name_list'] = db_name_list
+
+    return render(request, 'dbmanageapp/div_dbname.html', context)
+
+
+def make_excel(request):
+    sd = request.POST.get('ex_sd')
+    ed = request.POST.get('ex_ed')
+    ns = request.POST.get('ex_ns')
+    print(ns)
+
+
+    datetime_format = "%Y-%m-%d"
+    onsd = datetime.strptime(sd, datetime_format)
+    oned = datetime.strptime(ed, datetime_format)
+    set_date = set_search_day(onsd, oned)
+
+    response = HttpResponse(content_type="application/vnd.ms-excel")
+    response["Content-Disposition"] = 'attachment;filename*=UTF-8\'\'example.xls'
+    wb = xlwt.Workbook(encoding='ansi')  # encoding은 ansi로 해준다.
+    ws = wb.add_sheet('sheet1')  # 시트 추가
+
+    all_memo = DbMemo.objects.filter(dm_date__range=[set_date[0], set_date[1]])
+
+    row_num = 0
+    col_names = ['마케터', '전화번호', '이름', '나이', '성별', '자산', '담당자', '담당자 닉네임', '상태', '결제금액', '결제상태']
+
+    # 열이름을 첫번째 행에 추가 시켜준다.
+    for idx, col_name in enumerate(col_names):
+        ws.write(row_num, idx, col_name)
+
+    # 데이터 베이스에서 유저 정보를 불러온다.
+
+    print(set_date[0])
+    print(set_date[1])
+    print(ns)
+    all_db_list = UploadDb.objects.select_related('db_mkname').filter(db_date__range=[set_date[0], set_date[1]], db_status=ns)
+    print(all_db_list)
+
+    rows = []
+    for dblist in all_db_list:
+        chk_memo = all_memo.filter(dm_chkdb=dblist)
+        print(dblist)
+
+        try:
+            chk_marketer = dblist.db_mkname.mk_company
+        except:
+            chk_marketer = ""
+        print(chk_marketer)
+
+        print(dblist.db_phone)
+        set_list = [chk_marketer, dblist.db_phone, dblist.db_member, dblist.db_age, dblist.db_sex, dblist.db_inv,
+                    dblist.db_manager, dblist.db_manager_nick, dblist.db_status, dblist.db_paidprice,
+                    dblist.db_paidstatus]
+        if (chk_memo):
+            for chkcount, memo in enumerate(chk_memo):
+                if chkcount > 2:
+                    break
+                else:
+                    set_list.append(memo.dm_memos)
+
+        rows.append(set_list)
+    # 유저정보를 한줄씩 작성한다.
+    for row in rows:
+        row_num += 1
+        for col_num, attr in enumerate(row):
+            ws.write(row_num, col_num, attr)
+
+    wb.save(response)
+    return response
+
+
 def update_db(request):
     chk_db_list = DbMemo.objects.all()
     for dlist in chk_db_list:
@@ -36,6 +149,7 @@ def update_db(request):
             dlist.dm_manager = dlist.dm_chkdb.db_manager
             dlist.save()
     return HttpResponse('완료가 잘 되었는지 봅시다.')
+
 
 @login_required
 def dbmainpage(request):
@@ -64,7 +178,7 @@ def dbmainpage(request):
     l_sales = last_month_price.aggregate(Sum('db_paidprice'))
     n_sales = n_sales['db_paidprice__sum']
     l_sales = l_sales['db_paidprice__sum']
-    i=0
+    i = 0
 
     if not n_sales or not l_sales:
         growth_per = None
@@ -73,7 +187,6 @@ def dbmainpage(request):
 
     return render(request, 'dbmanageapp/mainpage.html',
                   {'n_sales': n_sales, 'l_sales': l_sales, 'growth_per': growth_per})
-
 
 
 @login_required
@@ -219,14 +332,12 @@ def alldblist(request):
     q = Q()
     j = Q()
 
-
     get_list = {}
     geton = get_getlist(request, q, j)
     status_count = []
 
-    #변경 부분1
+    # 변경 부분1
     q.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
-
 
     all_get = UploadDb.objects.select_related('db_mkname').filter(q)
     all_count = all_get.count()
@@ -235,14 +346,13 @@ def alldblist(request):
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
         status_count.append(status_get.count())
 
-
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
 
     rangenum = list(reversed(range(1, db_list.count() + 1)))
 
     pagenum = make_get_page(db_list, geton['get_page_num'], geton['wp'])
-    #변경부분2
+    # 변경부분2
     db_list_val = UploadDb.objects.select_related('db_mkname').filter(q).order_by('-db_date')[pagenum[0]:pagenum[1]]
     pg_rangenum = rangenum[pagenum[0]:pagenum[1]]
 
@@ -255,7 +365,10 @@ def alldblist(request):
         change_status = request.POST.getlist('change_status[]')
         change_manager = request.POST['change_manager']
         change_manager_nick = request.POST['change_manager_nick']
+        change_all_status = request.POST.get('change_all_status')
 
+        print(change_manager)
+        print(change_all_status)
         if 'update' in request.POST['submit_btn']:
             for val in list_num:
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
@@ -263,6 +376,8 @@ def alldblist(request):
                 if change_manager:
                     temp_item.db_manager = change_manager
                     temp_item.db_manager_nick = change_manager_nick
+                if change_all_status:
+                    temp_item.db_status = change_all_status
                 temp_item.save()
         elif 'all_delete' in request.POST['submit_btn']:
             now_datetime = datetime.today()
@@ -275,7 +390,6 @@ def alldblist(request):
                 temp_item = UploadDb.objects.get(id=list_id[int(val)])
                 temp_item.delete()
 
-
         qstring = request.POST.get('qstring')
         response = redirect(reverse('dbmanage:alldblist'))
         response['Location'] += "?"
@@ -286,6 +400,7 @@ def alldblist(request):
                    'status_list': status_list, 'status_count': status_count,
                    'marketing_list': marketing_list, 'pageval': pagenum[4],
                    'get_page_num': geton['get_page_num'], 'get_list': geton, 'all_count': all_count}, )
+
 
 @login_required
 def status_stats(request):
@@ -351,7 +466,6 @@ def status_stats(request):
     sum_list = sum_list + sum_list_arr
     make_sum = sum_list[1]
 
-
     j = -1
     for perchk in sum_list_arr:
         j = j + 1
@@ -364,9 +478,11 @@ def status_stats(request):
             per_list_arr[j] = per_on
     per_list = ['']
     per_list = per_list + per_list_arr
-    appon_list = zip(per_list,sum_list)
+    appon_list = zip(per_list, sum_list)
 
-    return render(request, 'dbmanageapp/status_stats.html', {'all_list_arr': all_list_arr, 'status_list': all_status_list,'appon_list':appon_list})
+    return render(request, 'dbmanageapp/status_stats.html',
+                  {'all_list_arr': all_list_arr, 'status_list': all_status_list, 'appon_list': appon_list})
+
 
 @login_required
 def emp_dblist(request):
@@ -399,8 +515,6 @@ def emp_dblist(request):
     for slist in status_list:
         status_get = UploadDb.objects.select_related('db_mkname').filter(q).filter(db_status=slist)
         status_count.append(status_get.count())
-
-
 
     # 전체 페이지값을 구해 페이지네이션을 구현한 뒤 원하는 갯수만큼 출력
     db_list = UploadDb.objects.select_related('db_mkname').filter(q)
@@ -435,12 +549,11 @@ def emp_dblist(request):
         response['Location'] += qstring
         return response
 
-
     return render(request, 'dbmanageapp/emp_dblist.html',
                   {'db_list_val': alldb_zip, 'status_count': status_count, 'status_count': status_count,
                    'status_list': status_list,
-                   'pageval': pagenum[4], 'get_page_num': geton['get_page_num'], 'get_list': geton, 'all_count': all_count}, )
-
+                   'pageval': pagenum[4], 'get_page_num': geton['get_page_num'], 'get_list': geton,
+                   'all_count': all_count}, )
 
 
 @login_required
@@ -547,8 +660,8 @@ def divdb(request):
     j.add(Q(db_date__range=[geton['set_date'][0], geton['set_date'][1]]), q.AND)
     # 날짜 GET 값 받기 에러 처리
     db_list = UploadDb.objects.filter(q)
-    
     userlist = User.objects.filter(rete='D',status='Y')
+
 
     error_text = ""
 
@@ -582,11 +695,6 @@ def divdb(request):
                     div_dv_update.save()
                 k += 1
 
-
-
-
-
-
             messages.success(request, "분배가 완료되었습니다.")
             return HttpResponseRedirect(reverse('dbmanage:divdb'))
         except:
@@ -597,7 +705,8 @@ def divdb(request):
             elif sum(list_int) > db_list.count():
                 error_text = '분배할 값이 DB 수량보다 많습니다.'
     return render(request, 'dbmanageapp/divdb.html',
-                  {'db_list': db_list, 'userlist': userlist,'all_db_count':all_db_count, 'db_count_arr': db_count_arr, 'get_list': geton,
+                  {'db_list': db_list, 'userlist': userlist, 'all_db_count': all_db_count, 'db_count_arr': db_count_arr,
+                   'get_list': geton,
                    'marketing_list': marketing_list, 'error_text': error_text})
 
 
@@ -643,6 +752,376 @@ def newdbup(request):
 
     overlap_db = []
 
+    if request.method == 'POST':
+
+        print("asldijfalisjdfliajsdlfjaslidfjalisdjfasfd")
+        now = datetime.now()
+        before_three_week = now - timedelta(weeks=10)
+        set_tr_date = set_search_day(before_three_week, now)
+        overlap_count = 0
+
+        dblist_text = request.POST['dblist_text']
+        new_db_file = request.FILES.get('dblist_file')
+        back_db_file = request.FILES.get('backup_dblist_file')
+
+        print(dblist_text)
+        print(new_db_file)
+        print(back_db_file)
+        if dblist_text or new_db_file:
+            if dblist_text and new_db_file is None:
+                dblist_text = dblist_text.splitlines(False)
+
+                i = 0
+                dblist = []
+                for val in dblist_text:
+                    val = re.sub("\!|\'|\?|\-", "", val)
+                    val = val.split(',')
+                    if val[0].isdigit():
+                        val[0] = val[0].zfill(11)
+                    if len(val) == 1:
+                        val.append(val[0])
+                    dblist.append(val)
+            else:
+                if new_db_file is not None:
+                    files = request.FILES.get('dblist_file')
+                    try:
+                        load_wb = load_workbook(files, data_only=True)
+                    except:
+                        error_message = "엑셀파일에 문제가 있습니다. 새로운 엑셀파일에 데이터를 넣고 업로드 해주세요"
+                        return render(request, 'dbmanageapp/newdbup.html',
+                                      {'marketing_list': marketing_list, 'sample_list': sample_list,
+                                       'error_message': error_message})
+                    load_ws = load_wb['Sheet1']
+                    dblist = []
+                    for row in load_ws.rows:
+                        row_value = []
+
+                        for cell in row:
+                            cellval = cell.value
+
+                            cellval = str(cellval)
+                            cellval = re.sub("\!|\'|\?|\-", "", cellval)
+
+                            if cellval.isdigit():
+                                cellval = cellval.zfill(11)
+                            if cellval == 'None' or not cellval:
+                                cellval = ""
+                            row_value.append(cellval)
+
+                        chk_list = [v for v in row_value if v]
+
+                        if not chk_list:
+                            break
+
+                        # if not row_value[1]:
+                        #     row_value[1] = row_value[0]
+                        if len(row_value) < 2:
+                            temp_rowval = row_value[0]
+                            row_value.append(temp_rowval)
+                        elif not row_value[1]:
+                            row_value[1] = row_value[0]
+
+                        dblist.append(row_value)
+
+            try:
+                base_seton = DbSetting.objects.last()
+                base_set_list = base_seton.ds_status.split(',')
+                base_status = base_set_list[0]
+                overlap_allow = base_seton.ds_overlapallow.split(',')
+
+                # 업로드 DB 구분을 위한 이름을 만듦
+                dbn_mkname = request.POST.get('dbn_mkname')
+                dbn_name = request.POST.get('dbn_name')
+                dbn_price = request.POST.get('dbn_price')
+                dbn_price = re.sub("\!|\'|\,|\-", "", dbn_price)
+                dbn_price = int(dbn_price)
+                dbn_memo = request.POST.get('dbn_memo')
+                chk_ml = MarketingList.objects.get(mk_company=dbn_mkname)
+                dbn_items = UploadDbName(dbn_mkname=chk_ml, dbn_name=dbn_name, dbn_price=dbn_price, dbn_memo=dbn_memo)
+                dbn_items.save()
+
+                temp_udb = UploadDbName.objects.last()
+                onfr = UploadDbName.objects.get(id=temp_udb.id)
+                temp_mkt = MarketingList.objects.get(mk_company=dbn_mkname)
+
+                # DB에 값 넣기
+
+                # 중복항목 검사할 전체 쿼리 값
+                chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]])
+                overlap_count = 0
+
+                for dbval in dblist:
+                    if len(dbval) < 6:
+                        set_arr_count = 6 - len(dbval)
+                        for i in range(set_arr_count):
+                            dbval.append('')
+                    # try:
+                    #     if chk_db_list.get(db_phone=dbval[0]):
+                    #         overlap_count += 1
+                    #         continue
+                    # except:
+                    #     pass
+                    try:
+                        chk_db = chk_db_list.filter(db_phone=dbval[0]).last()
+                        if chk_db:
+                            if chk_db.db_status in overlap_allow:
+                                chk_db_on = chk_db_list.filter(db_phone=dbval[0])
+                                for del_db in chk_db_on:
+                                    del_db.delete()
+                                pass
+                            else:
+                                overlap_count += 1
+                                continue
+                    except:
+                        pass
+
+                    db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
+                                     db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
+                    db_up.save()
+
+                    if dbval[5]:
+                        serch_menodb = UploadDb.objects.last()
+                        memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[5])
+                        memoup.save()
+
+                if len(dblist) == overlap_count:
+                    temp_udb.delete()
+                    overlap = "모든 항목이 중복됩니다. 같은 파일이 업로드 된것 같습니다."
+                elif overlap_count:
+                    overlap = f"{overlap_count} 건이 중복되었습니다."
+                else:
+                    overlap = ""
+                messages.success(request, f"DB 업로드가 완료 되었습니다. {overlap}")
+            except:
+                error_message = "업로드 요청된 DB가 없습니다. DB를 입력해주세요"
+                return render(request, 'dbmanageapp/newdbup.html',
+                              {'marketing_list': marketing_list, 'sample_list': sample_list,
+                               'error_message': error_message})
+        elif back_db_file:
+            try:
+                load_wb = load_workbook(back_db_file, data_only=True)
+            except:
+                error_message = "엑셀파일에 문제가 있습니다. 새로운 엑셀파일에 데이터를 넣고 업로드 해주세요"
+                return render(request, 'dbmanageapp/newdbup.html',
+                              {'marketing_list': marketing_list, 'sample_list': sample_list,
+                               'error_message': error_message})
+            load_ws = load_wb['Sheet1']
+            dblist = []
+            for row in load_ws.rows:
+                row_value = []
+
+                for cell in row:
+                    cellval = cell.value
+                    cellval = str(cellval)
+                    cellval = re.sub("\!|\'|\?|\-", "", cellval)
+
+                    if cellval.isdigit():
+                        cellval = cellval.zfill(11)
+                    if cellval == 'None' or not cellval:
+                        cellval = ""
+                    row_value.append(cellval)
+
+                chk_list = [v for v in row_value if v]
+
+                if not chk_list:
+                    break
+                dblist.append(row_value)
+
+            chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]])
+            overlap_count = 0
+            for dbval in dblist:
+                chk_db = chk_db_list.filter(db_phone=dbval[0]).last()
+                if chk_db:
+                    pass
+
+                db_up = UploadDb(db_phone=dbval[1], db_member=dbval[2], db_age=dbval[3], db_sex=dbval[4], db_inv=dbval[5], db_manager=dbval[6], db_manager_nick=dbval[7], db_status=dbval[8], db_paidprice=dbval[9], db_paidstatus=dbval[10])
+                db_up.save()
+
+                if dbval[11] != "":
+                    serch_menodb = UploadDb.objects.last()
+                    memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[11])
+                    memoup.save()
+
+                try:
+                    if dbval[12] != "":
+                        serch_menodb = UploadDb.objects.last()
+                        memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[12])
+                        memoup.save()
+                except:
+                    pass
+
+                try:
+                    if dbval[13] != "":
+                        serch_menodb = UploadDb.objects.last()
+                        memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[13])
+                        memoup.save()
+                except:
+                    pass
+
+    return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
+
+
+# def new_dbup(request):
+#     try:
+#         marketing_list = MarketingList.objects.all()
+#     except:
+#         marketing_list = '마케팅 리스트를 추가해주세요!'
+#
+#     try:
+#         sample_list = AllManage.objects.last()
+#     except:
+#         sample_list = ""
+#
+#     overlap_db = []
+#
+#     if request.method == 'POST':
+#         now = datetime.now()
+#         before_three_week = now - timedelta(weeks=10)
+#         set_tr_date = set_search_day(before_three_week, now)
+#         overlap_count = 0
+#
+#         dblist_text = request.POST['dblist_text']
+#         new_db_file = request.FILES.get('dblist_file')
+#         back_db_file = request.FILES.get('backup_dblist_file')
+#
+#         if dblist_text and new_db_file is None:
+#             dblist_text = dblist_text.splitlines(False)
+#
+#             i = 0
+#             dblist = []
+#             for val in dblist_text:
+#                 val = re.sub("\!|\'|\?|\-", "", val)
+#                 val = val.split(',')
+#                 if val[0].isdigit():
+#                     val[0] = val[0].zfill(11)
+#                 if len(val) == 1:
+#                     val.append(val[0])
+#                 dblist.append(val)
+#         else:
+#             if new_db_file is not None:
+#                 files = request.FILES.get('dblist_file')
+#                 try:
+#                     load_wb = load_workbook(files, data_only=True)
+#                 except:
+#                     error_message = "엑셀파일에 문제가 있습니다. 새로운 엑셀파일에 데이터를 넣고 업로드 해주세요"
+#                     return render(request, 'dbmanageapp/newdbup.html',
+#                                   {'marketing_list': marketing_list, 'sample_list': sample_list,
+#                                    'error_message': error_message})
+#                 load_ws = load_wb['Sheet1']
+#                 dblist = []
+#                 for row in load_ws.rows:
+#                     row_value = []
+#
+#                     for cell in row:
+#                         cellval = cell.value
+#
+#                         cellval = str(cellval)
+#                         cellval = re.sub("\!|\'|\?|\-", "", cellval)
+#
+#                         if cellval.isdigit():
+#                             cellval = cellval.zfill(11)
+#                         if cellval == 'None' or not cellval:
+#                             cellval = ""
+#                         row_value.append(cellval)
+#
+#                     chk_list = [v for v in row_value if v]
+#
+#                     if not chk_list:
+#                         break
+#
+#                     if len(row_value) < 2:
+#                         temp_rowval = row_value[0]
+#                         row_value.append(temp_rowval)
+#                     elif not row_value[1]:
+#                         row_value[1] = row_value[0]
+#
+#                     dblist.append(row_value)
+#
+#         try:
+#             base_seton = DbSetting.objects.last()
+#             base_set_list = base_seton.ds_status.split(',')
+#             base_status = base_set_list[0]
+#             overlap_allow = base_seton.ds_overlapallow.split(',')
+#
+#             # 업로드 DB 구분을 위한 이름을 만듦
+#             dbn_mkname = request.POST.get('dbn_mkname')
+#             dbn_name = request.POST.get('dbn_name')
+#             dbn_price = request.POST.get('dbn_price')
+#             dbn_price = re.sub("\!|\'|\,|\-", "", dbn_price)
+#             dbn_price = int(dbn_price)
+#             dbn_memo = request.POST.get('dbn_memo')
+#             chk_ml = MarketingList.objects.get(mk_company=dbn_mkname)
+#             dbn_items = UploadDbName(dbn_mkname=chk_ml, dbn_name=dbn_name, dbn_price=dbn_price, dbn_memo=dbn_memo)
+#             dbn_items.save()
+#
+#             temp_udb = UploadDbName.objects.last()
+#             onfr = UploadDbName.objects.get(id=temp_udb.id)
+#             temp_mkt = MarketingList.objects.get(mk_company=dbn_mkname)
+#
+#             # DB에 값 넣기
+#
+#             # 중복항목 검사할 전체 쿼리 값
+#             chk_db_list = UploadDb.objects.filter(db_date__range=[set_tr_date[0], set_tr_date[1]])
+#             overlap_count = 0
+#
+#             for dbval in dblist:
+#                 if len(dbval) < 6:
+#                     set_arr_count = 6 - len(dbval)
+#                     for i in range(set_arr_count):
+#                         dbval.append('')
+#
+#                 try:
+#                     chk_db = chk_db_list.filter(db_phone=dbval[0]).last()
+#                     if chk_db:
+#                         if chk_db.db_status in overlap_allow:
+#                             chk_db_on = chk_db_list.filter(db_phone=dbval[0])
+#                             for del_db in chk_db_on:
+#                                 del_db.delete()
+#                             pass
+#                         else:
+#                             overlap_count += 1
+#                             continue
+#                 except:
+#                     pass
+#
+#                 db_up = UploadDb(db_name=onfr, db_mkname=temp_mkt, db_member=dbval[1], db_phone=dbval[0],
+#                                  db_age=dbval[2], db_sex=dbval[3], db_inv=dbval[4], db_status=base_status)
+#                 db_up.save()
+#
+#                 if dbval[5]:
+#                     serch_menodb = UploadDb.objects.last()
+#                     memoup = DbMemo(dm_chkdb=serch_menodb, dm_memos=dbval[5])
+#                     memoup.save()
+#
+#             if len(dblist) == overlap_count:
+#                 temp_udb.delete()
+#                 overlap = "모든 항목이 중복됩니다. 같은 파일이 업로드 된것 같습니다."
+#             elif overlap_count:
+#                 overlap = f"{overlap_count} 건이 중복되었습니다."
+#             else:
+#                 overlap = ""
+#             messages.success(request, f"DB 업로드가 완료 되었습니다. {overlap}")
+#         except:
+#             error_message = "업로드 요청된 DB가 없습니다. DB를 입력해주세요"
+#             return render(request, 'dbmanageapp/newdbup.html',
+#                           {'marketing_list': marketing_list, 'sample_list': sample_list,
+#                            'error_message': error_message})
+#
+#     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
+
+
+def new_dbup(request):
+    try:
+        marketing_list = MarketingList.objects.all()
+    except:
+        marketing_list = '마케팅 리스트를 추가해주세요!'
+
+    try:
+        sample_list = AllManage.objects.last()
+    except:
+        sample_list = ""
+
+    overlap_db = []
 
     if request.method == 'POST':
         now = datetime.now()
@@ -650,10 +1129,11 @@ def newdbup(request):
         set_tr_date = set_search_day(before_three_week, now)
         overlap_count = 0
 
-
-
         dblist_text = request.POST['dblist_text']
-        if dblist_text and request.FILES.get('dblist_file') is None:
+        new_db_file = request.FILES.get('dblist_file')
+        back_db_file = request.FILES.get('backup_dblist_file')
+
+        if dblist_text and new_db_file is None:
             dblist_text = dblist_text.splitlines(False)
 
             i = 0
@@ -667,7 +1147,7 @@ def newdbup(request):
                     val.append(val[0])
                 dblist.append(val)
         else:
-            if request.FILES.get('dblist_file') is not None:
+            if new_db_file is not None:
                 files = request.FILES.get('dblist_file')
                 try:
                     load_wb = load_workbook(files, data_only=True)
@@ -698,9 +1178,6 @@ def newdbup(request):
                     if not chk_list:
                         break
 
-
-                    # if not row_value[1]:
-                    #     row_value[1] = row_value[0]
                     if len(row_value) < 2:
                         temp_rowval = row_value[0]
                         row_value.append(temp_rowval)
@@ -708,13 +1185,11 @@ def newdbup(request):
                         row_value[1] = row_value[0]
 
                     dblist.append(row_value)
-
         try:
             base_seton = DbSetting.objects.last()
             base_set_list = base_seton.ds_status.split(',')
             base_status = base_set_list[0]
             overlap_allow = base_seton.ds_overlapallow.split(',')
-
 
             # 업로드 DB 구분을 위한 이름을 만듦
             dbn_mkname = request.POST.get('dbn_mkname')
@@ -742,12 +1217,7 @@ def newdbup(request):
                     set_arr_count = 6 - len(dbval)
                     for i in range(set_arr_count):
                         dbval.append('')
-                # try:
-                #     if chk_db_list.get(db_phone=dbval[0]):
-                #         overlap_count += 1
-                #         continue
-                # except:
-                #     pass
+
                 try:
                     chk_db = chk_db_list.filter(db_phone=dbval[0]).last()
                     if chk_db:
@@ -786,8 +1256,6 @@ def newdbup(request):
                            'error_message': error_message})
 
     return render(request, 'dbmanageapp/newdbup.html', {'marketing_list': marketing_list, 'sample_list': sample_list})
-
-
 # **********************************
 
 
@@ -831,7 +1299,6 @@ def detail_customer(request, id):
 
     if request.method == 'POST':
         if request.POST['sbm_button'] == 'update':
-
 
             status_sel = request.POST.get('status_sel')
             payment_sel = request.POST.get('paystatus_sel')
